@@ -1,0 +1,824 @@
+/* ============================================================
+   Student Performance Index - Modern Professional UI
+   Bootstrap 5 | Poppins | White/Blue Theme
+   ============================================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #f5f7fb;
+    color: #333;
+    min-height: 100vh;
+}
+
+a {
+    text-decoration: none;
+}
+
+/* ===================== SIDEBAR ===================== */
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 260px;
+    height: 100vh;
+    background: #ffffff;
+    border-right: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    overflow-y: auto;
+    box-shadow: 0 0 20px rgba(0,0,0,0.03);
+}
+
+.sidebar .brand {
+    height: 65px;
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    border-bottom: none;
+}
+
+.sidebar .brand h4 {
+    font-weight: 700;
+    font-size: 20px;
+    color: #fff;
+    letter-spacing: 0.5px;
+}
+
+.sidebar .brand h4 i {
+    margin-right: 10px;
+    font-size: 22px;
+}
+
+.sidebar .nav-menu {
+    padding: 16px 0;
+}
+
+.sidebar .nav-item {
+    padding: 12px 24px;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    margin: 2px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.sidebar .nav-item:hover {
+    background: #eef2ff;
+    color: #2563eb;
+    border-left-color: #2563eb;
+}
+
+.sidebar .nav-item.active {
+    background: #eef2ff;
+    color: #2563eb;
+    border-left-color: #2563eb;
+    font-weight: 600;
+}
+
+.sidebar .nav-item i {
+    width: 22px;
+    font-size: 16px;
+    margin-right: 12px;
+    text-align: center;
+}
+
+.sidebar .nav-item span {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.nav-section-label {
+    padding: 20px 24px 8px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+}
+
+.sidebar hr {
+    border-color: #e5e7eb;
+    margin: 12px 24px;
+    opacity: 0.5;
+}
+
+/* ===================== MAIN CONTENT ===================== */
+.main-content {
+    margin-left: 260px;
+    min-height: 100vh;
+    transition: all 0.3s ease;
+}
+
+/* ===================== HEADER / NAVBAR ===================== */
+.header {
+    height: 65px;
+    background: #ffffff;
+    border-bottom: 1px solid #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 30px;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}
+
+.header .page-title h4 {
+    font-weight: 600;
+    color: #1f2937;
+    font-size: 18px;
+    margin: 0;
+}
+
+.header .user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.header .user-info span {
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.header .user-info .badge {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 20px;
+}
+
+.mobile-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: #4b5563;
+    font-size: 22px;
+    cursor: pointer;
+    padding: 5px;
+}
+
+/* ===================== CONTENT AREA ===================== */
+.content-area {
+    padding: 28px 30px;
+}
+
+/* ===================== STATS CARDS ===================== */
+.stat-card {
+    background: #ffffff;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 24px;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    height: 100%;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(37, 99, 235, 0.08);
+    border-color: #dbeafe;
+}
+
+.stat-card .stat-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    margin-bottom: 16px;
+}
+
+.stat-card .stat-icon.blue {
+    background: #eef2ff;
+    color: #2563eb;
+}
+
+.stat-card .stat-icon.green {
+    background: #ecfdf5;
+    color: #059669;
+}
+
+.stat-card .stat-icon.orange {
+    background: #fff7ed;
+    color: #ea580c;
+}
+
+.stat-card .stat-icon.red {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+.stat-card h3 {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 4px;
+    color: #1f2937;
+}
+
+.stat-card p {
+    color: #6b7280;
+    font-size: 14px;
+    margin: 0;
+    font-weight: 500;
+}
+
+/* ===================== CUSTOM CARDS ===================== */
+.custom-card {
+    background: #ffffff;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    height: 100%;
+}
+
+.custom-card .card-header {
+    background: transparent;
+    border-bottom: 1px solid #e9ecef;
+    padding: 18px 24px;
+    font-weight: 600;
+    color: #1f2937;
+    font-size: 15px;
+}
+
+.custom-card .card-body {
+    padding: 24px;
+    color: #4b5563;
+}
+
+/* ===================== TABLES ===================== */
+.table-wrapper {
+    background: #ffffff;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.table-header {
+    padding: 18px 24px;
+    border-bottom: 1px solid #e9ecef;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.table-header h5 {
+    font-weight: 600;
+    margin: 0;
+    color: #1f2937;
+    font-size: 16px;
+}
+
+.table-wrapper .table {
+    margin: 0;
+}
+
+.table-wrapper .table thead th {
+    background: #f8fafc;
+    border-bottom: 2px solid #e9ecef;
+    color: #475569;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 14px 16px;
+    white-space: nowrap;
+}
+
+.table-wrapper .table tbody td {
+    padding: 14px 16px;
+    vertical-align: middle;
+    color: #4b5563;
+    border-color: #f1f5f9;
+    font-size: 14px;
+}
+
+.table-wrapper .table tbody tr:hover {
+    background: #f8fafc;
+}
+
+.table-wrapper .table td .badge {
+    font-size: 12px;
+    padding: 4px 12px;
+    font-weight: 500;
+}
+
+/* ===================== BUTTONS ===================== */
+.btn-custom {
+    border-radius: 8px;
+    padding: 10px 22px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-custom:hover {
+    transform: translateY(-1px);
+}
+
+.btn-primary-custom {
+    background: #2563eb;
+    border: 1px solid #2563eb;
+    color: #ffffff;
+}
+
+.btn-primary-custom:hover {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+}
+
+.btn-outline-custom {
+    background: transparent;
+    border: 1px solid #d1d5db;
+    color: #4b5563;
+}
+
+.btn-outline-custom:hover {
+    background: #f3f4f6;
+    border-color: #9ca3af;
+    color: #1f2937;
+}
+
+.btn-sm-custom {
+    padding: 6px 14px;
+    font-size: 12px;
+}
+
+.btn-warning-custom {
+    background: #fbbf24;
+    border: 1px solid #fbbf24;
+    color: #78350f;
+}
+
+.btn-warning-custom:hover {
+    background: #f59e0b;
+    border-color: #f59e0b;
+    color: #78350f;
+}
+
+.btn-danger-custom {
+    background: #ef4444;
+    border: 1px solid #ef4444;
+    color: #fff;
+}
+
+.btn-danger-custom:hover {
+    background: #dc2626;
+    border-color: #dc2626;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+}
+
+.btn-info-custom {
+    background: #06b6d4;
+    border: 1px solid #06b6d4;
+    color: #fff;
+}
+
+.btn-info-custom:hover {
+    background: #0891b2;
+    border-color: #0891b2;
+    color: #fff;
+}
+
+.btn-success-custom {
+    background: #10b981;
+    border: 1px solid #10b981;
+    color: #fff;
+}
+
+.btn-success-custom:hover {
+    background: #059669;
+    border-color: #059669;
+    color: #fff;
+}
+
+/* ===================== FORMS ===================== */
+.form-label {
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 6px;
+    font-size: 14px;
+}
+
+.form-control, .form-select {
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 10px 16px;
+    background: #ffffff;
+    color: #1f2937;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    outline: none;
+}
+
+.form-control::placeholder {
+    color: #9ca3af;
+}
+
+textarea.form-control {
+    border-radius: 8px;
+    min-height: 80px;
+}
+
+/* ===================== ALERTS ===================== */
+.alert-custom {
+    border-radius: 10px;
+    border: none;
+    padding: 14px 20px;
+    font-size: 14px;
+}
+
+.alert-success {
+    background: #ecfdf5;
+    color: #065f46;
+    border-left: 4px solid #10b981;
+}
+
+.alert-danger {
+    background: #fef2f2;
+    color: #991b1b;
+    border-left: 4px solid #ef4444;
+}
+
+.alert-warning {
+    background: #fffbeb;
+    color: #92400e;
+    border-left: 4px solid #f59e0b;
+}
+
+.alert-info {
+    background: #ecfeff;
+    color: #155e75;
+    border-left: 4px solid #06b6d4;
+}
+
+/* ===================== BADGES ===================== */
+.badge {
+    font-weight: 500;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+.badge.bg-primary { background: #dbeafe !important; color: #1d4ed8 !important; }
+.badge.bg-success { background: #d1fae5 !important; color: #065f46 !important; }
+.badge.bg-danger { background: #fee2e2 !important; color: #991b1b !important; }
+.badge.bg-warning { background: #fef3c7 !important; color: #92400e !important; }
+.badge.bg-info { background: #cffafe !important; color: #155e75 !important; }
+.badge.bg-secondary { background: #f3f4f6 !important; color: #4b5563 !important; }
+.badge.bg-dark { background: #e5e7eb !important; color: #1f2937 !important; }
+
+/* ===================== PERFORMANCE INDEX DISPLAY ===================== */
+.pi-display {
+    text-align: center;
+    padding: 20px;
+}
+
+.pi-display .pi-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    font-size: 36px;
+    font-weight: 700;
+    color: #fff;
+}
+
+.pi-display .pi-circle.high {
+    background: linear-gradient(135deg, #059669, #10b981);
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.25);
+}
+
+.pi-display .pi-circle.medium {
+    background: linear-gradient(135deg, #d97706, #f59e0b);
+    box-shadow: 0 8px 25px rgba(245, 158, 11, 0.25);
+}
+
+.pi-display .pi-circle.low {
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+    box-shadow: 0 8px 25px rgba(239, 68, 68, 0.25);
+}
+
+.pi-display .pi-label {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+/* ===================== LOGIN PAGE ===================== */
+.login-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: #f5f7fb;
+    padding: 20px;
+}
+
+.login-card {
+    width: 420px;
+    padding: 45px 40px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 4px 25px rgba(0,0,0,0.06);
+    border: 1px solid #e9ecef;
+}
+
+.login-card .logo {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 24px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    font-size: 32px;
+}
+
+.login-card .logo i {
+    color: #fff;
+}
+
+.login-card h2 {
+    text-align: center;
+    margin-bottom: 28px;
+    font-size: 24px;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.login-card .input-box {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.login-card .input-box i.left {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    font-size: 16px;
+    z-index: 1;
+}
+
+.login-card .input-box i.right {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    font-size: 16px;
+    cursor: pointer;
+    z-index: 1;
+}
+
+.login-card .input-box input {
+    width: 100%;
+    padding: 12px 44px;
+    border: 1px solid #d1d5db;
+    outline: none;
+    border-radius: 10px;
+    background: #f9fafb;
+    color: #1f2937;
+    font-size: 14px;
+    font-family: 'Poppins', sans-serif;
+    transition: all 0.3s ease;
+}
+
+.login-card .input-box input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    background: #fff;
+}
+
+.login-card .input-box input::placeholder {
+    color: #9ca3af;
+}
+
+.login-card .options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 22px;
+    font-size: 13px;
+}
+
+.login-card .options label {
+    color: #4b5563;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.login-card .options input[type="checkbox"] {
+    accent-color: #2563eb;
+}
+
+.login-card .options a {
+    color: #2563eb;
+    font-weight: 500;
+}
+
+.login-card .options a:hover {
+    text-decoration: underline;
+}
+
+.login-card button[type="submit"] {
+    width: 100%;
+    padding: 13px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Poppins', sans-serif;
+}
+
+.login-card button[type="submit"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+}
+
+.login-card .signup {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 13px;
+}
+
+.login-card .signup span {
+    color: #6b7280;
+}
+
+.login-card .signup a {
+    font-weight: 600;
+    color: #2563eb;
+}
+
+/* ===================== PAGE SPECIFIC STYLES ===================== */
+.welcome-text {
+    color: #6b7280;
+    font-size: 14px;
+    margin-bottom: 24px;
+}
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width: 992px) {
+    .sidebar {
+        left: -260px;
+    }
+    .sidebar.show {
+        left: 0;
+    }
+    .main-content {
+        margin-left: 0;
+    }
+    .content-area {
+        padding: 20px;
+    }
+    .mobile-toggle {
+        display: block !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .header {
+        padding: 0 16px;
+    }
+    .content-area {
+        padding: 16px;
+    }
+    .login-card {
+        width: 100%;
+        padding: 35px 24px;
+    }
+    .table-header {
+        padding: 14px 16px;
+    }
+    .table-wrapper .table thead th,
+    .table-wrapper .table tbody td {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+    .stat-card {
+        padding: 18px;
+    }
+    .stat-card h3 {
+        font-size: 24px;
+    }
+}
+
+@media (max-width: 576px) {
+    .header .user-info span {
+        display: none;
+    }
+    .content-area {
+        padding: 12px;
+    }
+    .custom-card .card-header {
+        padding: 14px 16px;
+    }
+    .custom-card .card-body {
+        padding: 16px;
+    }
+}
+
+/* ===================== PRINT ===================== */
+@media print {
+    .sidebar, .header, .no-print {
+        display: none !important;
+    }
+    .main-content {
+        margin-left: 0 !important;
+    }
+    .content-area {
+        padding: 0 !important;
+    }
+}
+
+/* ===================== UTILITY OVERRIDES ===================== */
+.btn-close {
+    filter: none;
+    opacity: 0.5;
+}
+
+.btn-close:hover {
+    opacity: 0.8;
+}
+
+.table-responsive {
+    border-radius: 0;
+}
+
+.fs-7 {
+    font-size: 13px;
+}
+
+/* Rank badges */
+.rank-badge {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.rank-badge.gold {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.rank-badge.silver {
+    background: #f3f4f6;
+    color: #4b5563;
+}
+
+.rank-badge.bronze {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.rank-badge.default {
+    background: #e5e7eb;
+    color: #6b7280;
+}
+
