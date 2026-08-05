@@ -12,12 +12,13 @@ if ($temp_conn) {
     mysqli_query($temp_conn, "CREATE DATABASE IF NOT EXISTS student_performance");
     mysqli_select_db($temp_conn, "student_performance");
     
-    $str1 = "CREATE TABLE IF NOT EXISTS users (
+$str1 = "CREATE TABLE IF NOT EXISTS users (
         id INT(11) AUTO_INCREMENT PRIMARY KEY,
         username VARCHAR(50) NOT NULL UNIQUE,
         email VARCHAR(100) NOT NULL UNIQUE,
         password VARCHAR(255) NOT NULL,
-        role ENUM('admin', 'teacher') DEFAULT 'teacher',
+        role ENUM('admin', 'faculty', 'student') DEFAULT 'faculty',
+        student_id INT(11) DEFAULT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )";
     
@@ -66,10 +67,35 @@ if ($temp_conn) {
     $t3 = mysqli_query($temp_conn, $str3);
     $t4 = mysqli_query($temp_conn, $str4);
     
-    if ($t1 && $t2 && $t3 && $t4) {
+if ($t1 && $t2 && $t3 && $t4) {
+        // Migrate users table: add student_id column if missing
+        $col_check = mysqli_query($temp_conn, "SHOW COLUMNS FROM users LIKE 'student_id'");
+        if ($col_check && mysqli_num_rows($col_check) == 0) {
+            mysqli_query($temp_conn, "ALTER TABLE users ADD COLUMN student_id INT(11) DEFAULT NULL AFTER role");
+        }
+        // Migrate role enum if needed
+        $role_col = mysqli_query($temp_conn, "SHOW COLUMNS FROM users LIKE 'role'");
+        if ($role_col) {
+            $rc = mysqli_fetch_assoc($role_col);
+            if ($rc && strpos($rc['Type'], 'faculty') === false) {
+                mysqli_query($temp_conn, "ALTER TABLE users MODIFY COLUMN role ENUM('admin','faculty','student') DEFAULT 'faculty'");
+            }
+        }
+
         $check_admin = mysqli_query($temp_conn, "SELECT id FROM users WHERE username = 'admin'");
         if (mysqli_num_rows($check_admin) == 0) {
-            mysqli_query($temp_conn, "INSERT INTO users (username, email, password, role) VALUES ('admin', 'admin@example.com', 'admin123', 'admin')");
+            $admin_hash = password_hash('admin123', PASSWORD_DEFAULT);
+            mysqli_query($temp_conn, "INSERT INTO users (username, email, password, role) VALUES ('admin', 'admin@example.com', '$admin_hash', 'admin')");
+        } else {
+            // Update admin password to hash if it's currently plaintext
+            $admin_row = mysqli_fetch_assoc($check_admin);
+            $admin_id = $admin_row['id'];
+            $admin_fetch = mysqli_query($temp_conn, "SELECT password FROM users WHERE id = $admin_id");
+            $af = mysqli_fetch_assoc($admin_fetch);
+            if ($af && !password_verify('admin123', $af['password']) && $af['password'] === 'admin123') {
+                $new_hash = password_hash('admin123', PASSWORD_DEFAULT);
+                mysqli_query($temp_conn, "UPDATE users SET password = '$new_hash' WHERE id = $admin_id");
+            }
         }
         $setup_success = true;
         $setup_message = 'Database and tables created successfully!';

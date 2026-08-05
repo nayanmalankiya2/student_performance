@@ -22,8 +22,10 @@
                     echo 'Subject Management';
                 } elseif ($folder == 'marks') {
                     echo 'Marks Management';
-                } elseif ($folder == 'performance') {
+} elseif ($folder == 'performance') {
                     echo 'Performance Index';
+                } elseif ($folder == 'users') {
+                    echo 'User Management';
                 } else {
                     echo 'Student Performance Index';
                 }
@@ -39,12 +41,15 @@
             $back_url = $base_url . '/subjects/index.php';
         } elseif ($folder == 'marks' && in_array($page, ['add.php', 'edit.php'])) {
             $back_url = $base_url . '/marks/index.php';
-        } elseif ($folder == 'performance') {
+} elseif ($folder == 'performance') {
             $back_url = $base_url . '/index.php';
+        } elseif ($folder == 'users') {
+            $back_url = $base_url . '/users/index.php';
         }
         
-        // Don't show back button on main pages
-        if (!in_array($page, ['index.php', 'login.php', 'setup.php'])): 
+// Don't show back button on main pages or list pages (folder index.php)
+        $is_list_page = ($page == 'index.php' && in_array($folder, ['students', 'subjects', 'marks', 'performance', 'users']));
+        if (!in_array($page, ['index.php', 'login.php', 'setup.php']) && !$is_list_page): 
         ?>
         <a href="<?php echo $back_url; ?>" class="btn btn-outline-custom btn-sm-custom btn-custom ms-2" title="Back">
             <i class="fas fa-arrow-left"></i> Back

@@ -6,7 +6,8 @@ CREATE TABLE IF NOT EXISTS users (
     username VARCHAR(50) NOT NULL UNIQUE,
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    role ENUM('admin', 'teacher') DEFAULT 'teacher',
+    role ENUM('admin', 'faculty', 'student') DEFAULT 'faculty',
+    student_id INT(11) DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

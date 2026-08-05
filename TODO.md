@@ -1,35 +1,24 @@
-# Student Performance Management System - Modern UI Redesign ✅
+# Role-Based Access Control Implementation TODO
 
-## Completed Steps:
+## Status: COMPLETE ✅
 
-### Phase 1: Core Layout Files ✅
-- [x] 1. Create new `assets/css/style.css` (complete replacement - white/blue theme)
-- [x] 2. Rewrite `header.php` (fix broken HTML, clean layout)
-- [x] 3. Rewrite `sidebar.php` (clean professional sidebar)
-
-### Phase 2: Auth & Setup Pages ✅
-- [x] 4. Redesign `login.php` (clean modern login)
-- [x] 5. Redesign `setup.php` (clean setup page)
-
-### Phase 3: Dashboard ✅
-- [x] 6. Redesign `index.php` (properly aligned dashboard cards)
-
-### Phase 4: Students Module ✅
-- [x] 7. Redesign `students/index.php` (clean table)
-- [x] 8. Redesign `students/add.php` (clean form)
-- [x] 9. Redesign `students/edit.php` (clean form)
-- [x] 10. Redesign `students/performance.php` (clean performance view)
-
-### Phase 5: Subjects Module ✅
-- [x] 11. Redesign `subjects/index.php` (clean table)
-- [x] 12. Redesign `subjects/add.php` (clean form)
-- [x] 13. Redesign `subjects/edit.php` (clean form)
-
-### Phase 6: Marks Module ✅
-- [x] 14. Redesign `marks/index.php` (clean table)
-- [x] 15. Redesign `marks/add.php` (clean form)
-- [x] 16. Redesign `marks/edit.php` (clean form)
-
-### Phase 7: Performance Module ✅
-- [x] 17. Redesign `performance/index.php` (clean ranking table)
-
+- [x] 1. Create `inc/auth.php` - role helper functions (require_login, require_admin, require_faculty_or_admin, is_admin, is_faculty, is_student, get_student_id, redirect_by_role)
+- [x] 2. Update `sql/database.sql` - users table: student_id column + role enum (admin/faculty/student)
+- [x] 3. Update `setup.php` - hash admin password, add student_id column, role enum migration
+- [x] 4. Update `login.php` - DB-based authentication (password_verify), role-based redirect
+- [x] 5. Update `sidebar.php` - role-based menu (Manage Users admin-only; students get My Profile)
+- [x] 6. Update `index.php` - students redirected to own performance
+- [x] 7. Create `users/index.php` - user list (admin only)
+- [x] 8. Create `users/add.php` - create faculty/student account (admin only)
+- [x] 9. Create `users/edit.php` - edit/delete user (admin only)
+- [x] 10. Update `students/add.php` - add username/password fields for student login
+- [x] 11. Update `students/edit.php` - edit student login credentials
+- [x] 12. Update `students/index.php` - student role read-only (redirect to own profile)
+- [x] 13. Update `students/performance.php` - student can only view own + hide add-marks for students
+- [x] 14. Update `subjects/*` - student role read-only, faculty/admin full
+- [x] 15. Update `marks/*` - student role read-only, faculty/admin full
+- [x] 16. Update `performance/index.php` - student redirected to own data
+- [x] 17. Test the full flow (all files pass PHP syntax check)
+- [x] 18. Update `config.php` - define BASE_URL + include auth helpers
+- [x] 19. Update `header.php` - handle users folder title/back button
+- [x] 20. Update `student_performance.sql` - users table schema

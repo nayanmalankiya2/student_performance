@@ -6,6 +6,21 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+// Students see their own performance dashboard
+if (is_student()) {
+    $sid = get_student_id();
+    if ($sid > 0) {
+        // Verify the student exists
+        $chk = mysqli_query($conn, "SELECT id FROM students WHERE id = $sid");
+        if ($chk && mysqli_num_rows($chk) > 0) {
+            header("Location: students/performance.php?id=$sid");
+            exit();
+        }
+    }
+    // Student has no valid linked student record - show a friendly page
+    $student_orphan = true;
+}
+
 $total_students = 0;
 $total_subjects = 0;
 $total_marks = 0;
@@ -65,10 +80,20 @@ $recent = mysqli_query($conn, "SELECT * FROM students ORDER BY created_at DESC L
     <div class="main-content">
         <?php include 'header.php'; ?>
         <div class="content-area">
-            <!-- Welcome Text -->
+<!-- Welcome Text -->
             <div class="welcome-text">
                 Welcome back, <strong><?php echo isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username']) : 'Admin'; ?></strong>! Here's your overview.
             </div>
+
+            <?php if (isset($student_orphan) && $student_orphan): ?>
+                <div class="alert alert-warning alert-custom d-flex align-items-center mb-4">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <div>
+                        <strong>No student profile linked to your account.</strong><br>
+                        Please contact your admin/faculty to link your student profile. Once linked, your performance will appear here.
+                    </div>
+                </div>
+            <?php endif; ?>
 
             <!-- Stats Cards -->
             <div class="row g-4 mb-4">

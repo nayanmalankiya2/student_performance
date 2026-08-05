@@ -14,14 +14,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if (empty($username) || empty($password)) {
         $error = 'Please enter username and password.';
-    } elseif ($username == 'admin' && $password == 'admin123') {
-        $_SESSION['user_id'] = 1;
-        $_SESSION['username'] = 'admin';
-        $_SESSION['role'] = 'admin';
-        header("Location: index.php");
-        exit();
     } else {
-        $error = 'Invalid username or password!';
+        // DB-based authentication
+        $stmt = $conn->prepare("SELECT id, username, email, password, role, student_id FROM users WHERE username = ?");
+        $stmt->bind_param('s', $username);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        $user = $res->fetch_assoc();
+        $stmt->close();
+
+        if ($user && password_verify($password, $user['password'])) {
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['role'] = $user['role'];
+            $_SESSION['student_id'] = $user['student_id'];
+
+// Role-based redirect
+            if ($user['role'] == 'student' && !empty($user['student_id']) && $user['student_id'] > 0) {
+                header("Location: students/performance.php?id=" . (int)$user['student_id']);
+                exit();
+            }
+            // Admin, faculty, or student without valid linked student → go to dashboard
+            header("Location: index.php");
+            exit();
+        } else {
+            $error = 'Invalid username or password!';
+        }
     }
 }
 ?>

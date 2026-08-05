@@ -6,7 +6,16 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-// Delete
+// Students can only view (read-only). Redirect to their own profile.
+if (is_student()) {
+    $myid = get_student_id();
+    if ($myid > 0) {
+        header("Location: performance.php?id=$myid");
+    }
+    exit();
+}
+
+// Delete (admin/faculty only)
 if (isset($_REQUEST['delete'])) {
     $id = (int)$_REQUEST['delete'];
     $str = "DELETE FROM students WHERE id = $id";

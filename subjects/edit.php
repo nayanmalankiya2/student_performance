@@ -6,6 +6,9 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+// Only admin/faculty can edit subjects
+require_faculty_or_admin();
+
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 $sub = mysqli_query($conn, "SELECT * FROM subjects WHERE id = $id");
 $subject = mysqli_fetch_assoc($sub);

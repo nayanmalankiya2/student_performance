@@ -6,7 +6,20 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-$result = mysqli_query($conn, "SELECT s.*, 
+// Students only see their own performance
+$is_student_view = is_student();
+if ($is_student_view) {
+    $my_student_id = get_student_id();
+    if ($my_student_id <= 0) {
+        header("Location: ../index.php");
+        exit();
+    }
+    // Redirect students to their own performance page
+    header("Location: ../students/performance.php?id=$my_student_id");
+    exit();
+}
+
+$result = mysqli_query($conn, "SELECT s.*,
                        COALESCE(SUM(m.total_marks), 0) as total_obtained,
                        COALESCE(SUM(sub.max_marks), 0) as total_max,
                        COUNT(DISTINCT m.id) as subject_count,

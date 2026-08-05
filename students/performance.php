@@ -8,6 +8,15 @@ if (!isset($_SESSION['user_id'])) {
 
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
+// Students can only view their own performance
+if (is_student()) {
+    $myid = get_student_id();
+    if ($myid <= 0 || $id != $myid) {
+        header("Location: index.php");
+        exit();
+    }
+}
+
 $stu = mysqli_query($conn, "SELECT * FROM students WHERE id = $id");
 $student = mysqli_fetch_assoc($stu);
 
@@ -190,10 +199,12 @@ if ($total_max > 0) {
                                 <div class="text-center py-5">
                                     <i class="fas fa-file-alt fa-4x text-muted mb-3"></i>
                                     <h5 class="text-muted">No academic records found.</h5>
-                                    <p class="text-muted mb-3">Add marks to see performance analysis.</p>
+                                    <p class="text-muted mb-3"><?php echo is_student() ? 'Marks will appear here once added by your faculty.' : 'Add marks to see performance analysis.'; ?></p>
+                                    <?php if (!is_student()): ?>
                                     <a href="../marks/add.php?student_id=<?php echo $id; ?>" class="btn btn-primary-custom btn-custom">
                                         <i class="fas fa-plus me-1"></i> Add Marks
                                     </a>
+                                    <?php endif; ?>
                                 </div>
                             <?php endif; ?>
                         </div>

@@ -6,6 +6,9 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+// Only admin/faculty can edit marks
+require_faculty_or_admin();
+
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 $mar = mysqli_query($conn, "SELECT * FROM marks WHERE id = $id");
 $mark = mysqli_fetch_assoc($mar);

@@ -6,6 +6,9 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+// Only admin/faculty can edit students (students are read-only)
+require_faculty_or_admin();
+
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 $stu = mysqli_query($conn, "SELECT * FROM students WHERE id = $id");
@@ -30,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $semester = (int)$_REQUEST['semester'];
     $course = $_REQUEST['course'];
 
-    $str = "UPDATE students SET 
+$str = "UPDATE students SET 
             enrollment_no = '$enrollment_no',
             first_name = '$first_name',
             last_name = '$last_name',
@@ -44,14 +47,53 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             WHERE id = $id";
     
     if (mysqli_query($conn, $str)) {
-        $_SESSION['message'] = 'Student updated successfully!';
-        $_SESSION['msg_type'] = 'success';
-        header("Location: index.php");
-        exit();
+        // Update student login credentials
+        $login_username = trim($_REQUEST['login_username']);
+        $login_password = $_REQUEST['login_password'];
+
+        $existing = mysqli_query($conn, "SELECT id, username FROM users WHERE student_id = $id AND role = 'student'");
+        $has_login = ($existing && mysqli_num_rows($existing) > 0);
+
+        if ($has_login) {
+            $ex = mysqli_fetch_assoc($existing);
+            $uid = $ex['id'];
+            if (!empty($login_username)) {
+                $check_u = mysqli_query($conn, "SELECT id FROM users WHERE username = '$login_username' AND id != $uid");
+                if ($check_u && mysqli_num_rows($check_u) > 0) {
+                    $error = 'Username already exists!';
+                } else {
+                    if (!empty($login_password)) {
+                        $hash = password_hash($login_password, PASSWORD_DEFAULT);
+                        mysqli_query($conn, "UPDATE users SET username = '$login_username', password = '$hash' WHERE id = $uid");
+                    } else {
+                        mysqli_query($conn, "UPDATE users SET username = '$login_username' WHERE id = $uid");
+                    }
+                }
+            } elseif (!empty($login_password)) {
+                $hash = password_hash($login_password, PASSWORD_DEFAULT);
+                mysqli_query($conn, "UPDATE users SET password = '$hash' WHERE id = $uid");
+            }
+        } elseif (!empty($login_username) && !empty($login_password)) {
+            $hash = password_hash($login_password, PASSWORD_DEFAULT);
+            mysqli_query($conn, "INSERT INTO users (username, email, password, role, student_id) 
+                                 VALUES ('$login_username', '$email', '$hash', 'student', $id)");
+        }
+
+        if (empty($error)) {
+            $_SESSION['message'] = 'Student updated successfully!';
+            $_SESSION['msg_type'] = 'success';
+            header("Location: index.php");
+            exit();
+        }
     } else {
         $error = 'Error: ' . mysqli_error($conn);
     }
 }
+
+// Get existing login info
+$existing_login = mysqli_query($conn, "SELECT id, username FROM users WHERE student_id = $id AND role = 'student'");
+$saved_login = ($existing_login && mysqli_num_rows($existing_login) > 0) ? mysqli_fetch_assoc($existing_login) : null;
+$saved_username = $saved_login ? $saved_login['username'] : '';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -123,9 +165,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 <label class="form-label">Course <span class="text-danger">*</span></label>
                                 <input type="text" name="course" class="form-control" value="<?php echo htmlspecialchars($student['course']); ?>" required>
                             </div>
-                            <div class="col-md-12">
+<div class="col-md-12">
                                 <label class="form-label">Address</label>
                                 <textarea name="address" class="form-control" rows="3"><?php echo htmlspecialchars($student['address']); ?></textarea>
+                            </div>
+                            <div class="col-12">
+                                <div class="alert alert-info alert-custom">
+                                    <i class="fas fa-key me-2"></i>
+                                    <strong>Student Login Credentials:</strong> Update the username/password so this student can login and view their performance.
+                                    <?php if ($saved_username): ?>
+                                        <br><span class="text-muted">Current login username: <strong><?php echo htmlspecialchars($saved_username); ?></strong></span>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Login Username</label>
+                                <input type="text" name="login_username" class="form-control" value="<?php echo htmlspecialchars($saved_username); ?>" placeholder="Username">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Login Password</label>
+                                <input type="password" name="login_password" class="form-control" placeholder="Leave empty to keep current password">
                             </div>
                             <div class="col-12">
                                 <hr class="my-2">

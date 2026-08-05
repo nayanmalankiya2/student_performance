@@ -6,6 +6,9 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+// Only admin/faculty can add marks
+require_faculty_or_admin();
+
 $error = '';
 $selected_student = isset($_GET['student_id']) ? (int)$_GET['student_id'] : 0;
 

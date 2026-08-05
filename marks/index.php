@@ -6,7 +6,24 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+// Students can view marks (read-only)
+$is_student_view = is_student();
+
+if ($is_student_view) {
+    // Students only see their own marks
+    $my_student_id = get_student_id();
+    if ($my_student_id <= 0) {
+        header("Location: index.php");
+        exit();
+    }
+}
+
+// Delete (admin/faculty only) - students cannot delete
 if (isset($_REQUEST['delete'])) {
+    if ($is_student_view) {
+        header("Location: index.php");
+        exit();
+    }
     $id = (int)$_REQUEST['delete'];
     mysqli_query($conn, "DELETE FROM marks WHERE id = $id");
     $_SESSION['message'] = 'Mark record deleted successfully!';
@@ -15,10 +32,15 @@ if (isset($_REQUEST['delete'])) {
     exit();
 }
 
+$where = '';
+if ($is_student_view) {
+    $where = "WHERE m.student_id = $my_student_id";
+}
 $result = mysqli_query($conn, "SELECT m.*, s.first_name, s.last_name, s.enrollment_no, sub.subject_name, sub.subject_code
                        FROM marks m
                        JOIN students s ON m.student_id = s.id
                        JOIN subjects sub ON m.subject_id = sub.id
+                       $where
                        ORDER BY m.created_at DESC");
 
 $message = isset($_SESSION['message']) ? $_SESSION['message'] : '';
@@ -49,9 +71,11 @@ unset($_SESSION['message'], $_SESSION['msg_type']);
                 </div>
             <?php endif; ?>
             <div class="table-wrapper">
-                <div class="table-header">
-                    <h5><i class="fas fa-file-alt me-2"></i>All Marks Records</h5>
+<div class="table-header">
+                    <h5><i class="fas fa-file-alt me-2"></i><?php echo $is_student_view ? 'My Marks Records' : 'All Marks Records'; ?></h5>
+                    <?php if (!$is_student_view): ?>
                     <a href="add.php" class="btn btn-primary-custom btn-custom"><i class="fas fa-plus me-1"></i> Add Marks</a>
+                    <?php endif; ?>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
@@ -65,9 +89,9 @@ unset($_SESSION['message'], $_SESSION['msg_type']);
                                 <th>Internal</th>
                                 <th>External</th>
                                 <th>Total</th>
-                                <th>Grade</th>
+<th>Grade</th>
                                 <th>Year</th>
-                                <th class="text-end">Actions</th>
+                                <?php if (!$is_student_view): ?><th class="text-end">Actions</th><?php endif; ?>
                             </tr>
                         </thead>
                         <tbody>
@@ -90,7 +114,8 @@ unset($_SESSION['message'], $_SESSION['msg_type']);
                                         ?>
                                         <span class="badge bg-<?php echo $gr_bg; ?>"><?php echo $gr; ?></span>
                                     </td>
-                                    <td><?php echo $row['exam_year']; ?></td>
+<td><?php echo $row['exam_year']; ?></td>
+                                    <?php if (!$is_student_view): ?>
                                     <td class="text-end">
                                         <div class="d-flex gap-1 justify-content-end">
                                             <a href="edit.php?id=<?php echo $row['id']; ?>" class="btn btn-warning-custom btn-sm-custom btn-custom" title="Edit">
@@ -101,10 +126,11 @@ unset($_SESSION['message'], $_SESSION['msg_type']);
                                             </a>
                                         </div>
                                     </td>
+                                    <?php endif; ?>
                                 </tr>
                             <?php endwhile; else: ?>
                                 <tr>
-                                    <td colspan="11" class="text-center py-5">
+                                    <td colspan="<?php echo $is_student_view ? 10 : 11; ?>" class="text-center py-5">
                                         <i class="fas fa-file-alt fa-3x text-muted mb-3 d-block"></i>
                                         <p class="text-muted mb-2">No marks records found.</p>
                                         <a href="add.php" class="btn btn-primary-custom btn-custom">

@@ -6,6 +6,9 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+// Only admin/faculty can add subjects
+require_faculty_or_admin();
+
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
