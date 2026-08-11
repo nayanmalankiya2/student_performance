@@ -1,5 +1,6 @@
 <?php
-include '../config/config.php';
+include __DIR__ . '/../config/config.php';
+//include '../config/config.php';
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: ../login.php");

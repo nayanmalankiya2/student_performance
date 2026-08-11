@@ -1,5 +1,6 @@
 <?php
-include '../config/config.php';
+include __DIR__ . '/../config/config.php';
+//include '../config/config.php';
 require_admin();
 
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
