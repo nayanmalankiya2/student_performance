@@ -62,6 +62,10 @@
             <?php echo isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username']) : 'User'; ?>
             <span class="badge bg-primary ms-1"><?php echo isset($_SESSION['role']) ? htmlspecialchars($_SESSION['role']) : ''; ?></span>
         </span>
+        <button class="theme-toggle btn btn-outline-custom btn-sm-custom btn-custom" id="themeToggle" title="Toggle Dark/Light Mode" onclick="toggleTheme()">
+            <i class="fas fa-moon" id="themeIcon"></i>
+            <span id="themeLabel">Dark</span>
+        </button>
         <a href="<?php echo $base_url; ?>/logout.php" class="btn btn-outline-custom btn-sm-custom btn-custom" title="Logout">
             <i class="fas fa-sign-out-alt"></i> Logout
         </a>
@@ -73,5 +77,41 @@ function toggleSidebar() {
     var sidebar = document.getElementById('sidebar');
     sidebar.classList.toggle('show');
 }
+
+// ===================== THEME TOGGLE =====================
+function toggleTheme() {
+    var body = document.body;
+    var icon = document.getElementById('themeIcon');
+    var label = document.getElementById('themeLabel');
+
+    if (body.classList.contains('dark-mode')) {
+        body.classList.remove('dark-mode');
+        localStorage.setItem('theme', 'light');
+        icon.classList.remove('fa-sun');
+        icon.classList.add('fa-moon');
+        label.textContent = 'Dark';
+    } else {
+        body.classList.add('dark-mode');
+        localStorage.setItem('theme', 'dark');
+        icon.classList.remove('fa-moon');
+        icon.classList.add('fa-sun');
+        label.textContent = 'Light';
+    }
+}
+
+// Apply saved theme on page load
+(function initTheme() {
+    var savedTheme = localStorage.getItem('theme');
+    var body = document.body;
+    var icon = document.getElementById('themeIcon');
+    var label = document.getElementById('themeLabel');
+
+    if (savedTheme === 'dark') {
+        body.classList.add('dark-mode');
+        icon.classList.remove('fa-moon');
+        icon.classList.add('fa-sun');
+        label.textContent = 'Light';
+    }
+})();
 </script>
 

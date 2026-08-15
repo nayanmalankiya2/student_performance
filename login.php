@@ -54,6 +54,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
+    <button class="theme-toggle theme-toggle-login btn btn-outline-custom btn-custom" id="themeToggle" title="Toggle Dark/Light Mode" onclick="toggleTheme()">
+        <i class="fas fa-moon" id="themeIcon"></i>
+        <span id="themeLabel">Dark</span>
+    </button>
     <div class="login-wrapper">
         <div class="login-card">
             <div class="logo">
@@ -96,6 +100,42 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             p.type = "password";
         }
     }
+
+    // ===================== THEME TOGGLE =====================
+    function toggleTheme() {
+        var body = document.body;
+        var icon = document.getElementById('themeIcon');
+        var label = document.getElementById('themeLabel');
+
+        if (body.classList.contains('dark-mode')) {
+            body.classList.remove('dark-mode');
+            localStorage.setItem('theme', 'light');
+            icon.classList.remove('fa-sun');
+            icon.classList.add('fa-moon');
+            label.textContent = 'Dark';
+        } else {
+            body.classList.add('dark-mode');
+            localStorage.setItem('theme', 'dark');
+            icon.classList.remove('fa-moon');
+            icon.classList.add('fa-sun');
+            label.textContent = 'Light';
+        }
+    }
+
+    // Apply saved theme on page load
+    (function initTheme() {
+        var savedTheme = localStorage.getItem('theme');
+        var body = document.body;
+        var icon = document.getElementById('themeIcon');
+        var label = document.getElementById('themeLabel');
+
+        if (savedTheme === 'dark') {
+            body.classList.add('dark-mode');
+            icon.classList.remove('fa-moon');
+            icon.classList.add('fa-sun');
+            label.textContent = 'Light';
+        }
+    })();
     </script>
 </body>
 </html>

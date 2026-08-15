@@ -822,3 +822,412 @@ textarea.form-control {
     color: #6b7280;
 }
 
+/* ===================== THEME TOGGLE BUTTON ===================== */
+.theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.theme-toggle-login {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 2000;
+}
+
+/* ===================== DARK MODE ===================== */
+body.dark-mode {
+    background: #0f172a;
+    color: #e2e8f0;
+}
+
+body.dark-mode a {
+    color: #93c5fd;
+}
+
+/* --- Sidebar --- */
+body.dark-mode .sidebar {
+    background: #1e293b;
+    border-right-color: #334155;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .sidebar .brand {
+    background: linear-gradient(135deg, #1d4ed8, #1e40af);
+}
+
+body.dark-mode .sidebar .nav-item {
+    color: #94a3b8;
+}
+
+body.dark-mode .sidebar .nav-item:hover,
+body.dark-mode .sidebar .nav-item.active {
+    background: #2563eb33;
+    color: #60a5fa;
+    border-left-color: #60a5fa;
+}
+
+body.dark-mode .nav-section-label {
+    color: #64748b;
+}
+
+body.dark-mode .sidebar hr {
+    border-color: #334155;
+}
+
+/* --- Header --- */
+body.dark-mode .header {
+    background: #1e293b;
+    border-bottom-color: #334155;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .header .page-title h4 {
+    color: #f1f5f9;
+}
+
+body.dark-mode .header .user-info span {
+    color: #94a3b8;
+}
+
+body.dark-mode .mobile-toggle {
+    color: #94a3b8;
+}
+
+/* --- Content Area --- */
+body.dark-mode .welcome-text {
+    color: #94a3b8;
+}
+
+/* --- Login Page --- */
+body.dark-mode .login-wrapper {
+    background: #0f172a;
+}
+
+body.dark-mode .login-card {
+    background: #1e293b;
+    border-color: #334155;
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-mode .login-card h2 {
+    color: #f1f5f9;
+}
+
+body.dark-mode .login-card .input-box input {
+    background: #0f172a;
+    border-color: #475569;
+    color: #e2e8f0;
+}
+
+body.dark-mode .login-card .input-box input:focus {
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.15);
+    background: #0f172a;
+}
+
+body.dark-mode .login-card .input-box i.left,
+body.dark-mode .login-card .input-box i.right {
+    color: #64748b;
+}
+
+body.dark-mode .login-card .options label {
+    color: #94a3b8;
+}
+
+body.dark-mode .login-card .signup span {
+    color: #94a3b8;
+}
+
+/* --- Stats Cards --- */
+body.dark-mode .stat-card {
+    background: #1e293b;
+    border-color: #334155;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .stat-card:hover {
+    border-color: #2563eb;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-mode .stat-card h3 {
+    color: #f1f5f9;
+}
+
+body.dark-mode .stat-card p {
+    color: #94a3b8;
+}
+
+body.dark-mode .stat-card .stat-icon.blue {
+    background: #1e3a8a40;
+    color: #60a5fa;
+}
+
+body.dark-mode .stat-card .stat-icon.green {
+    background: #065f4640;
+    color: #34d399;
+}
+
+body.dark-mode .stat-card .stat-icon.orange {
+    background: #9a341240;
+    color: #fb923c;
+}
+
+body.dark-mode .stat-card .stat-icon.red {
+    background: #991b1b40;
+    color: #f87171;
+}
+
+/* --- Custom Cards --- */
+body.dark-mode .custom-card {
+    background: #1e293b;
+    border-color: #334155;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .custom-card .card-header {
+    border-bottom-color: #334155;
+    color: #f1f5f9;
+}
+
+body.dark-mode .custom-card .card-body {
+    color: #cbd5e1;
+}
+
+body.dark-mode .custom-card .text-muted {
+    color: #94a3b8 !important;
+}
+
+/* --- Table Wrapper --- */
+body.dark-mode .table-wrapper {
+    background: #1e293b;
+    border-color: #334155;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .table-header {
+    border-bottom-color: #334155;
+}
+
+body.dark-mode .table-header h5 {
+    color: #f1f5f9;
+}
+
+body.dark-mode .table-wrapper .table thead th {
+    background: #0f172a;
+    border-bottom-color: #334155;
+    color: #94a3b8;
+}
+
+body.dark-mode .table-wrapper .table tbody td {
+    color: #cbd5e1;
+    border-color: #334155;
+}
+
+body.dark-mode .table-wrapper .table tbody tr:hover {
+    background: #0f172a;
+}
+
+body.dark-mode .table-hover tbody tr:hover {
+    background: #0f172a;
+}
+
+/* --- List Group (Recent Students) --- */
+body.dark-mode .list-group-item {
+    background: #1e293b;
+    border-color: #334155;
+    color: #cbd5e1;
+}
+
+body.dark-mode .list-group-item .text-muted {
+    color: #94a3b8 !important;
+}
+
+body.dark-mode .list-group-item:hover {
+    background: #0f172a;
+}
+
+body.dark-mode .border-top,
+body.dark-mode .border-bottom {
+    border-color: #334155 !important;
+}
+
+/* --- Buttons --- */
+body.dark-mode .btn-outline-custom {
+    border-color: #475569;
+    color: #cbd5e1;
+}
+
+body.dark-mode .btn-outline-custom:hover {
+    background: #334155;
+    border-color: #64748b;
+    color: #f1f5f9;
+}
+
+body.dark-mode .btn-primary-custom {
+    background: #2563eb;
+    border-color: #2563eb;
+}
+
+body.dark-mode .btn-primary-custom:hover {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+}
+
+/* --- Forms --- */
+body.dark-mode .form-label {
+    color: #cbd5e1;
+}
+
+body.dark-mode .form-control,
+body.dark-mode .form-select {
+    background: #0f172a;
+    border-color: #475569;
+    color: #e2e8f0;
+}
+
+body.dark-mode .form-control:focus,
+body.dark-mode .form-select:focus {
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.15);
+    background: #0f172a;
+}
+
+body.dark-mode .form-control::placeholder {
+    color: #64748b;
+}
+
+/* --- Alerts --- */
+body.dark-mode .alert-success {
+    background: #065f4633;
+    color: #6ee7b7;
+    border-left-color: #10b981;
+}
+
+body.dark-mode .alert-danger {
+    background: #991b1b33;
+    color: #fca5a5;
+    border-left-color: #ef4444;
+}
+
+body.dark-mode .alert-warning {
+    background: #92400e33;
+    color: #fcd34d;
+    border-left-color: #f59e0b;
+}
+
+body.dark-mode .alert-info {
+    background: #155e7533;
+    color: #67e8f9;
+    border-left-color: #06b6d4;
+}
+
+/* --- Badges --- */
+body.dark-mode .badge {
+    color: #e2e8f0 !important;
+}
+
+body.dark-mode .badge.bg-primary { background: #1e3a8a !important; color: #93c5fd !important; }
+body.dark-mode .badge.bg-success { background: #065f46 !important; color: #6ee7b7 !important; }
+body.dark-mode .badge.bg-danger { background: #7f1d1d !important; color: #fca5a5 !important; }
+body.dark-mode .badge.bg-warning { background: #78350f !important; color: #fcd34d !important; }
+body.dark-mode .badge.bg-info { background: #164e63 !important; color: #67e8f9 !important; }
+body.dark-mode .badge.bg-secondary { background: #334155 !important; color: #cbd5e1 !important; }
+body.dark-mode .badge.bg-dark { background: #475569 !important; color: #f1f5f9 !important; }
+
+/* --- Performance Index Display --- */
+body.dark-mode .pi-display .pi-label {
+    color: #f1f5f9;
+}
+
+/* --- Rank Badges --- */
+body.dark-mode .rank-badge.gold {
+    background: #78350f;
+    color: #fcd34d;
+}
+
+body.dark-mode .rank-badge.silver {
+    background: #334155;
+    color: #cbd5e1;
+}
+
+body.dark-mode .rank-badge.bronze {
+    background: #7f1d1d;
+    color: #fca5a5;
+}
+
+body.dark-mode .rank-badge.default {
+    background: #334155;
+    color: #94a3b8;
+}
+
+/* --- Pagination --- */
+body.dark-mode .pagination .page-link {
+    background: #1e293b;
+    border-color: #334155;
+    color: #94a3b8;
+}
+
+body.dark-mode .pagination .page-item.active .page-link {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: #fff;
+}
+
+body.dark-mode .pagination .page-item.disabled .page-link {
+    background: #1e293b;
+    border-color: #334155;
+    color: #475569;
+}
+
+/* --- Modal --- */
+body.dark-mode .modal-content {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+body.dark-mode .modal-header,
+body.dark-mode .modal-footer {
+    border-color: #334155;
+}
+
+body.dark-mode .modal-title {
+    color: #f1f5f9;
+}
+
+body.dark-mode .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+/* --- Dropdown --- */
+body.dark-mode .dropdown-menu {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+body.dark-mode .dropdown-item {
+    color: #cbd5e1;
+}
+
+body.dark-mode .dropdown-item:hover {
+    background: #0f172a;
+    color: #f1f5f9;
+}
+
+/* --- Misc dark mode text adjustments --- */
+body.dark-mode .text-dark { color: #e2e8f0 !important; }
+body.dark-mode h1, body.dark-mode h2, body.dark-mode h3,
+body.dark-mode h4, body.dark-mode h5, body.dark-mode h6 {
+    color: #f1f5f9;
+}
+
+body.dark-mode .bg-white {
+    background-color: #1e293b !important;
+}
+
+body.dark-mode .bg-light {
+    background-color: #0f172a !important;
+}
+
