@@ -829,13 +829,6 @@ textarea.form-control {
     gap: 8px;
 }
 
-.theme-toggle-login {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 2000;
-}
-
 /* ===================== DARK MODE ===================== */
 body.dark-mode {
     background: #0f172a;
