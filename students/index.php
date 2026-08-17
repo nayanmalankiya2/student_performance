@@ -73,7 +73,6 @@ unset($_SESSION['message'], $_SESSION['msg_type']);
                                 <th>#</th>
                                 <th>Enrollment No</th>
                                 <th>Name</th>
-                                <th>Email</th>
                                 <th>Phone</th>
                                 <th>Semester</th>
                                 <th>Course</th>
@@ -88,7 +87,6 @@ unset($_SESSION['message'], $_SESSION['msg_type']);
                                     <td class="fw-medium"><?php echo $i++; ?></td>
                                     <td><strong><?php echo htmlspecialchars($row['enrollment_no']); ?></strong></td>
                                     <td><?php echo htmlspecialchars($row['first_name'] . ' ' . $row['last_name']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['email']); ?></td>
                                     <td><?php echo htmlspecialchars($row['phone']); ?></td>
                                     <td><span class="badge bg-info">Sem <?php echo $row['semester']; ?></span></td>
                                     <td><?php echo htmlspecialchars($row['course']); ?></td>
@@ -110,7 +108,7 @@ unset($_SESSION['message'], $_SESSION['msg_type']);
                                 <?php endwhile; ?>
                             <?php else: ?>
                                 <tr>
-                                    <td colspan="9" class="text-center py-5">
+                                    <td colspan="8" class="text-center py-5">
                                         <i class="fas fa-user-graduate fa-3x text-muted mb-3 d-block"></i>
                                         <p class="text-muted mb-2">No students found.</p>
                                         <a href="add.php" class="btn btn-primary-custom btn-custom">

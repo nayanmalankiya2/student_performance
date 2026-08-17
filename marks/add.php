@@ -7,14 +7,22 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-// Only admin/faculty can add marks
-require_faculty_or_admin();
+// Only faculty can add marks
+require_faculty();
 
 $error = '';
 $selected_student = isset($_GET['student_id']) ? (int)$_GET['student_id'] : 0;
 
 $students_query = mysqli_query($conn, "SELECT id, enrollment_no, first_name, last_name, semester FROM students ORDER BY first_name");
 $subjects_query = mysqli_query($conn, "SELECT id, subject_code, subject_name, semester, max_marks FROM subjects ORDER BY semester, subject_name");
+
+// Build a JS array of all subjects for semester-wise filtering
+$all_subjects = array();
+while ($subj = mysqli_fetch_assoc($subjects_query)) {
+    $all_subjects[] = $subj;
+}
+mysqli_data_seek($subjects_query, 0);
+$subjects_json = json_encode($all_subjects);
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $student_id = (int)$_REQUEST['student_id'];
@@ -29,20 +37,36 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $sub_row = mysqli_fetch_assoc($sub);
     $max = $sub_row['max_marks'];
     $total = $internal_marks + $external_marks;
+
+    // Validate: Internal ≤ subject max, External ≤ subject max, Total ≤ 100
+    if ($internal_marks < 0 || $external_marks < 0) {
+        $error = 'Marks cannot be negative!';
+    } elseif ($internal_marks > $max) {
+        $error = 'Internal marks cannot exceed ' . $max . '!';
+    } elseif ($external_marks > $max) {
+        $error = 'External marks cannot exceed ' . $max . '!';
+    } elseif ($total > 100) {
+        $error = 'Total marks (Internal + External) cannot exceed 100!';
+    }
     
-    $percentage = ($total / $max) * 100;
-    if ($percentage >= 90) $grade = 'A+';
-    elseif ($percentage >= 80) $grade = 'A';
-    elseif ($percentage >= 70) $grade = 'B+';
-    elseif ($percentage >= 60) $grade = 'B';
-    elseif ($percentage >= 50) $grade = 'C';
-    elseif ($percentage >= 40) $grade = 'D';
-    else $grade = 'F';
+    // Calculate grade only if total is valid
+    if (empty($error)) {
+        $percentage = ($total / $max) * 100;
+        if ($percentage >= 90) $grade = 'A+';
+        elseif ($percentage >= 80) $grade = 'A';
+        elseif ($percentage >= 70) $grade = 'B+';
+        elseif ($percentage >= 60) $grade = 'B';
+        elseif ($percentage >= 50) $grade = 'C';
+        elseif ($percentage >= 40) $grade = 'D';
+        else $grade = 'F';
+    }
 
     $check = mysqli_query($conn, "SELECT id FROM marks WHERE student_id = $student_id AND subject_id = $subject_id AND semester = $semester AND exam_year = $exam_year");
-    if ($check && mysqli_num_rows($check) > 0) {
+    if (empty($error) && $check && mysqli_num_rows($check) > 0) {
         $error = 'Marks already exist for this student, subject, semester, and year!';
-    } else {
+    }
+    
+    if (empty($error)) {
         $str = "INSERT INTO marks (student_id, subject_id, semester, internal_marks, external_marks, total_marks, grade, exam_year, created_by) 
                 VALUES ($student_id, $subject_id, $semester, $internal_marks, $external_marks, $total, '$grade', $exam_year, $user_id)";
         if (mysqli_query($conn, $str)) {
@@ -94,32 +118,34 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 </select>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Subject <span class="text-danger">*</span></label>
-                                <select name="subject_id" class="form-select" required>
-                                    <option value="">Select Subject</option>
-                                    <?php while ($sub = mysqli_fetch_assoc($subjects_query)): ?>
-                                        <option value="<?php echo $sub['id']; ?>">
-                                            <?php echo htmlspecialchars($sub['subject_name'] . ' (' . $sub['subject_code'] . ') - Sem ' . $sub['semester']); ?>
-                                        </option>
-                                    <?php endwhile; ?>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
                                 <label class="form-label">Semester <span class="text-danger">*</span></label>
-                                <select name="semester" class="form-select" required>
-                                    <option value="">Select</option>
+                                <select name="semester" id="semester_select" class="form-select" required onchange="filterSubjects()">
+                                    <option value="">Select Semester</option>
                                     <?php for ($i = 1; $i <= 6; $i++): ?>
                                         <option value="<?php echo $i; ?>">Semester <?php echo $i; ?></option>
                                     <?php endfor; ?>
                                 </select>
                             </div>
+            <div class="col-md-6">
+                                <label class="form-label">Subject <span class="text-danger">*</span></label>
+                                <select name="subject_id" id="subject_select" class="form-select" required onchange="updateMaxMarks()">
+                                    <option value="">Select Semester First</option>
+                                </select>
+                                <small class="text-muted">Subjects are filtered by the selected semester. Max Marks: <strong id="max_marks_label">—</strong></small>
+                            </div>
                             <div class="col-md-3">
                                 <label class="form-label">Internal Marks</label>
-                                <input type="number" step="0.01" name="internal_marks" class="form-control" value="0" placeholder="0.00">
+                                <input type="number" step="0.01" name="internal_marks" id="internal_marks" class="form-control" value="0" placeholder="0.00" min="0" oninput="validateMarks()">
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label">External Marks</label>
-                                <input type="number" step="0.01" name="external_marks" class="form-control" value="0" placeholder="0.00">
+                                <input type="number" step="0.01" name="external_marks" id="external_marks" class="form-control" value="0" placeholder="0.00" min="0" oninput="validateMarks()">
+                            </div>
+                            <div class="col-12">
+                                <div id="marks_alert" class="alert alert-danger alert-custom d-none">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <span id="marks_alert_msg">Internal & External marks each cannot exceed 50!</span>
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label">Exam Year <span class="text-danger">*</span></label>
@@ -144,8 +170,99 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </div>
         </div>
     </div>
+    <script>
+    // All subjects data (id, subject_code, subject_name, semester)
+    var allSubjects = <?php echo $subjects_json; ?>;
+
+    function updateMaxMarks() {
+        var subjectId = document.getElementById('subject_select').value;
+        var maxLabel = document.getElementById('max_marks_label');
+        if (subjectId) {
+            var found = allSubjects.find(function(s) { return String(s.id) === String(subjectId); });
+            if (found) {
+                maxLabel.textContent = found.max_marks;
+            }
+        } else {
+            maxLabel.textContent = '—';
+        }
+        validateMarks();
+    }
+
+    function validateMarks() {
+        var subjectId = document.getElementById('subject_select').value;
+        var internal = parseFloat(document.getElementById('internal_marks').value) || 0;
+        var external = parseFloat(document.getElementById('external_marks').value) || 0;
+        var total = internal + external;
+        var alertBox = document.getElementById('marks_alert');
+        var alertMsg = document.getElementById('marks_alert_msg');
+
+        if (!subjectId) {
+            alertBox.classList.add('d-none');
+            return;
+        }
+
+        var found = allSubjects.find(function(s) { return String(s.id) === String(subjectId); });
+        var max = found ? parseFloat(found.max_marks) : 100;
+
+        if (internal > max) {
+            alertMsg.textContent = 'Internal marks cannot exceed ' + max + '!';
+            alertBox.classList.remove('d-none');
+        } else if (external > max) {
+            alertMsg.textContent = 'External marks cannot exceed ' + max + '!';
+            alertBox.classList.remove('d-none');
+        } else if (total > 100) {
+            alertMsg.textContent = 'Total marks (Internal + External) cannot exceed 100!';
+            alertBox.classList.remove('d-none');
+        } else {
+            alertBox.classList.add('d-none');
+        }
+    }
+
+    function filterSubjects() {
+        var sem = document.getElementById('semester_select').value;
+        var subjectSelect = document.getElementById('subject_select');
+        // Clear current options
+        subjectSelect.innerHTML = '';
+
+        if (!sem) {
+            var opt = document.createElement('option');
+            opt.value = '';
+            opt.textContent = 'Select Semester First';
+            subjectSelect.appendChild(opt);
+            return;
+        }
+
+        // Filter subjects by selected semester
+        var filtered = allSubjects.filter(function(s) {
+            return String(s.semester) === String(sem);
+        });
+
+        if (filtered.length === 0) {
+            var opt = document.createElement('option');
+            opt.value = '';
+            opt.textContent = 'No subjects for Semester ' + sem;
+            subjectSelect.appendChild(opt);
+            return;
+        }
+
+        var opt = document.createElement('option');
+        opt.value = '';
+        opt.textContent = 'Select Subject';
+        subjectSelect.appendChild(opt);
+
+        filtered.forEach(function(s) {
+            var o = document.createElement('option');
+            o.value = s.id;
+            o.textContent = s.subject_name + ' (' + s.subject_code + ')';
+            subjectSelect.appendChild(o);
+        });
+    }
+
+    // Initialize on page load
+    filterSubjects();
+    updateMaxMarks();
+    </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
 <?php mysqli_close($conn); ?>
-

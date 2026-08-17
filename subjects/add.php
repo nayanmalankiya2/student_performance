@@ -7,8 +7,8 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-// Only admin/faculty can add subjects
-require_faculty_or_admin();
+// Only admin can add subjects
+require_admin();
 
 $error = '';
 

@@ -7,12 +7,12 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-// Students can view subjects (read-only)
-$is_student_view = is_student();
+// Students & Faculty can view subjects (read-only), only Admin can modify
+$is_readonly_view = is_student() || is_faculty();
 
-// Delete (admin/faculty only) - students cannot delete
+// Delete (admin only) - students & faculty cannot delete
 if (isset($_REQUEST['delete'])) {
-    if ($is_student_view) {
+    if ($is_readonly_view) {
         header("Location: index.php");
         exit();
     }
@@ -55,7 +55,7 @@ unset($_SESSION['message'], $_SESSION['msg_type']);
             <div class="table-wrapper">
 <div class="table-header">
                     <h5><i class="fas fa-book me-2"></i>All Subjects</h5>
-                    <?php if (!$is_student_view): ?>
+                    <?php if (!$is_readonly_view): ?>
                     <a href="add.php" class="btn btn-primary-custom btn-custom"><i class="fas fa-plus me-1"></i> Add Subject</a>
                     <?php endif; ?>
                 </div>
@@ -68,8 +68,8 @@ unset($_SESSION['message'], $_SESSION['msg_type']);
                                 <th>Subject Name</th>
                                 <th>Semester</th>
                                 <th>Max Marks</th>
-<th>Used In Records</th>
-                                <?php if (!$is_student_view): ?><th class="text-end">Actions</th><?php endif; ?>
+                                <th>Used In Records</th>
+                                <?php if (!$is_readonly_view): ?><th class="text-end">Actions</th><?php endif; ?>
                             </tr>
                         </thead>
                         <tbody>
@@ -81,7 +81,7 @@ unset($_SESSION['message'], $_SESSION['msg_type']);
                                     <td><span class="badge bg-info">Sem <?php echo $row['semester']; ?></span></td>
                                     <td><?php echo $row['max_marks']; ?></td>
 <td><span class="badge bg-secondary"><?php echo $row['usage_count']; ?></span></td>
-                                    <?php if (!$is_student_view): ?>
+                                    <?php if (!$is_readonly_view): ?>
                                     <td class="text-end">
                                         <div class="d-flex gap-1 justify-content-end">
                                             <a href="edit.php?id=<?php echo $row['id']; ?>" class="btn btn-warning-custom btn-sm-custom btn-custom" title="Edit">
@@ -96,12 +96,14 @@ unset($_SESSION['message'], $_SESSION['msg_type']);
                                 </tr>
                             <?php endwhile; else: ?>
                                 <tr>
-                                    <td colspan="<?php echo $is_student_view ? 6 : 7; ?>" class="text-center py-5">
+                                    <td colspan="<?php echo $is_readonly_view ? 6 : 7; ?>" class="text-center py-5">
                                         <i class="fas fa-book fa-3x text-muted mb-3 d-block"></i>
                                         <p class="text-muted mb-2">No subjects found.</p>
+                                        <?php if (!$is_readonly_view): ?>
                                         <a href="add.php" class="btn btn-primary-custom btn-custom">
                                             <i class="fas fa-plus me-1"></i> Add Your First Subject
                                         </a>
+                                        <?php endif; ?>
                                     </td>
                                 </tr>
                             <?php endif; ?>

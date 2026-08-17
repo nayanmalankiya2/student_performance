@@ -22,7 +22,7 @@ if ($is_student_view) {
 
 $result = mysqli_query($conn, "SELECT s.*,
                        COALESCE(SUM(m.total_marks), 0) as total_obtained,
-                       COALESCE(SUM(sub.max_marks), 0) as total_max,
+                       COALESCE(SUM(sub.max_marks * 2), 0) as total_max,
                        COUNT(DISTINCT m.id) as subject_count,
                        COUNT(DISTINCT m.semester) as semester_count
                        FROM students s
@@ -127,7 +127,7 @@ unset($_SESSION['message'], $_SESSION['msg_type']);
                                         $cgpa = 0;
                                     } else {
                                         $pct = ($row['total_obtained'] / $row['total_max']) * 100;
-                                        $cgpa = round(($pct / 100) * 10, 2);
+                                        $cgpa = min(10, round(($pct / 100) * 10, 2));
                                     }
                                     if ($cgpa >= 9.0) $level = 'Outstanding';
                                     elseif ($cgpa >= 8.0) $level = 'Excellent';
@@ -175,9 +175,11 @@ unset($_SESSION['message'], $_SESSION['msg_type']);
                                     <td colspan="10" class="text-center py-5">
                                         <i class="fas fa-chart-bar fa-3x text-muted mb-3 d-block"></i>
                                         <p class="text-muted mb-2">No performance data available.</p>
+                                        <?php if (is_faculty()): ?>
                                         <a href="../marks/add.php" class="btn btn-primary-custom btn-custom">
                                             <i class="fas fa-plus me-1"></i> Add Marks Records
                                         </a>
+                                        <?php endif; ?>
                                     </td>
                                 </tr>
                             <?php endif; ?>

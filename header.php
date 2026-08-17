@@ -35,7 +35,9 @@
         <?php
         // Determine back button URL based on current page
         $back_url = $base_url . '/index.php';
-        if ($folder == 'students' && in_array($page, ['add.php', 'edit.php', 'performance.php'])) {
+        if ($folder == 'students' && $page == 'edit_my_profile.php') {
+            $back_url = $base_url . '/students/performance.php?id=' . get_student_id();
+        } elseif ($folder == 'students' && in_array($page, ['add.php', 'edit.php', 'performance.php'])) {
             $back_url = $base_url . '/students/index.php';
         } elseif ($folder == 'subjects' && in_array($page, ['add.php', 'edit.php'])) {
             $back_url = $base_url . '/subjects/index.php';

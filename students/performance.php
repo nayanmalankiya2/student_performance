@@ -37,8 +37,12 @@ $total_max = 0;
 $semester_wise = array();
 
 while ($mark = mysqli_fetch_assoc($marks_result)) {
-    $total_obtained += $mark['total_marks'];
-    $total_max += $mark['max_marks'];
+    // Effective total = internal + external (capped at 100)
+    $effective_total = min($mark['internal_marks'] + $mark['external_marks'], 100);
+    $mark['effective_total'] = $effective_total;
+    $total_obtained += $effective_total;
+    // Each subject has internal (max_marks) + external (max_marks) = 2 * max_marks total possible
+    $total_max += $mark['max_marks'] * 2;
     $semester_wise[$mark['semester']][] = $mark;
 }
 
@@ -48,7 +52,7 @@ $level_class = 'secondary';
 
 if ($total_max > 0) {
     $pct = ($total_obtained / $total_max) * 100;
-    $cgpa = round(($pct / 100) * 10, 2);
+    $cgpa = min(10, round(($pct / 100) * 10, 2));
     
     if ($cgpa >= 9.0) { $level = 'Outstanding'; $level_class = 'success'; }
     elseif ($cgpa >= 8.0) { $level = 'Excellent'; $level_class = 'success'; }
@@ -110,6 +114,12 @@ if ($total_max > 0) {
                                     <small class="text-muted">CGPA</small>
                                 </div>
                             </div>
+                            <?php if (is_student()): ?>
+                            <hr>
+                            <a href="edit_my_profile.php" class="btn btn-primary-custom btn-custom w-100">
+                                <i class="fas fa-user-edit me-2"></i> Edit My Profile
+                            </a>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -123,9 +133,22 @@ if ($total_max > 0) {
                         <div class="card-body">
                             <?php if (count($semester_wise) > 0): ?>
                                 <?php foreach ($semester_wise as $sem => $marks): ?>
+                                    <?php 
+                                    // Calculate semester CGPA using effective totals
+                                    $sem_total = 0; 
+                                    $sem_max = 0; 
+                                    foreach ($marks as $m) {
+                                        $sem_total += $m['effective_total'];
+                                        $sem_max += $m['max_marks'] * 2;
+                                    }
+                                    $sem_cgpa = ($sem_max > 0) ? min(10, round(($sem_total / $sem_max) * 10, 2)) : 0;
+                                    ?>
                                     <div class="d-flex align-items-center gap-2 mb-3 mt-2">
                                         <span class="badge bg-primary fs-6 px-3 py-2">
                                             <i class="fas fa-layer-group me-1"></i> Semester <?php echo $sem; ?>
+                                        </span>
+                                        <span class="badge bg-success fs-6 px-3 py-2">
+                                            <i class="fas fa-chart-pie me-1"></i> CGPA: <?php echo $sem_cgpa; ?>/10
                                         </span>
                                     </div>
                                     <div class="table-responsive">
@@ -148,7 +171,7 @@ if ($total_max > 0) {
                                                     <td><strong><?php echo htmlspecialchars($m['subject_code']); ?></strong></td>
                                                     <td><?php echo $m['internal_marks']; ?></td>
                                                     <td><?php echo $m['external_marks']; ?></td>
-                                                    <td><strong><?php echo $m['total_marks']; ?></strong></td>
+                                                    <td><strong><?php echo $m['effective_total']; ?></strong></td>
                                                     <td>
                                                         <?php 
                                                         $grade = $m['grade'];
@@ -159,7 +182,7 @@ if ($total_max > 0) {
                                                         <span class="badge bg-<?php echo $grade_bg; ?>"><?php echo $grade; ?></span>
                                                     </td>
                                                 </tr>
-                                                <?php $sem_total += $m['total_marks']; $sem_max += $m['max_marks']; ?>
+                                                <?php $sem_total += $m['effective_total']; $sem_max += $m['max_marks'] * 2; ?>
                                                 <?php endforeach; ?>
                                                 <tr class="table-primary fw-bold">
                                                     <td colspan="4" class="text-end">Semester Total:</td>
@@ -167,7 +190,7 @@ if ($total_max > 0) {
                                                     <td>
                                                         <?php 
                                                         $sem_pct = ($sem_total / $sem_max) * 100; 
-                                                        echo round(($sem_pct / 100) * 10, 2); 
+                                                        echo min(10, round(($sem_pct / 100) * 10, 2)); 
                                                         ?> PI
                                                     </td>
                                                 </tr>
@@ -201,7 +224,7 @@ if ($total_max > 0) {
                                     <i class="fas fa-file-alt fa-4x text-muted mb-3"></i>
                                     <h5 class="text-muted">No academic records found.</h5>
                                     <p class="text-muted mb-3"><?php echo is_student() ? 'Marks will appear here once added by your faculty.' : 'Add marks to see performance analysis.'; ?></p>
-                                    <?php if (!is_student()): ?>
+                                    <?php if (is_faculty()): ?>
                                     <a href="../marks/add.php?student_id=<?php echo $id; ?>" class="btn btn-primary-custom btn-custom">
                                         <i class="fas fa-plus me-1"></i> Add Marks
                                     </a>

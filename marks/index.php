@@ -7,8 +7,9 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-// Students can view marks (read-only)
+// Students can view marks (read-only), Admin can view all marks (read-only), only Faculty can modify
 $is_student_view = is_student();
+$is_readonly_view = is_student() || is_admin();
 
 if ($is_student_view) {
     // Students only see their own marks
@@ -19,9 +20,9 @@ if ($is_student_view) {
     }
 }
 
-// Delete (admin/faculty only) - students cannot delete
+// Delete (faculty only) - students & admin cannot delete
 if (isset($_REQUEST['delete'])) {
-    if ($is_student_view) {
+    if ($is_readonly_view) {
         header("Location: index.php");
         exit();
     }
@@ -74,7 +75,7 @@ unset($_SESSION['message'], $_SESSION['msg_type']);
             <div class="table-wrapper">
 <div class="table-header">
                     <h5><i class="fas fa-file-alt me-2"></i><?php echo $is_student_view ? 'My Marks Records' : 'All Marks Records'; ?></h5>
-                    <?php if (!$is_student_view): ?>
+                    <?php if (!$is_readonly_view): ?>
                     <a href="add.php" class="btn btn-primary-custom btn-custom"><i class="fas fa-plus me-1"></i> Add Marks</a>
                     <?php endif; ?>
                 </div>
@@ -92,7 +93,7 @@ unset($_SESSION['message'], $_SESSION['msg_type']);
                                 <th>Total</th>
 <th>Grade</th>
                                 <th>Year</th>
-                                <?php if (!$is_student_view): ?><th class="text-end">Actions</th><?php endif; ?>
+                                <?php if (!$is_readonly_view): ?><th class="text-end">Actions</th><?php endif; ?>
                             </tr>
                         </thead>
                         <tbody>
@@ -116,7 +117,7 @@ unset($_SESSION['message'], $_SESSION['msg_type']);
                                         <span class="badge bg-<?php echo $gr_bg; ?>"><?php echo $gr; ?></span>
                                     </td>
 <td><?php echo $row['exam_year']; ?></td>
-                                    <?php if (!$is_student_view): ?>
+                                    <?php if (!$is_readonly_view): ?>
                                     <td class="text-end">
                                         <div class="d-flex gap-1 justify-content-end">
                                             <a href="edit.php?id=<?php echo $row['id']; ?>" class="btn btn-warning-custom btn-sm-custom btn-custom" title="Edit">
@@ -131,12 +132,14 @@ unset($_SESSION['message'], $_SESSION['msg_type']);
                                 </tr>
                             <?php endwhile; else: ?>
                                 <tr>
-                                    <td colspan="<?php echo $is_student_view ? 10 : 11; ?>" class="text-center py-5">
+                                    <td colspan="<?php echo $is_readonly_view ? 10 : 11; ?>" class="text-center py-5">
                                         <i class="fas fa-file-alt fa-3x text-muted mb-3 d-block"></i>
                                         <p class="text-muted mb-2">No marks records found.</p>
+                                        <?php if (!$is_readonly_view): ?>
                                         <a href="add.php" class="btn btn-primary-custom btn-custom">
                                             <i class="fas fa-plus me-1"></i> Add Your First Record
                                         </a>
+                                        <?php endif; ?>
                                     </td>
                                 </tr>
                             <?php endif; ?>

@@ -21,6 +21,15 @@ function require_admin() {
     }
 }
 
+// Require faculty role only (not admin)
+function require_faculty() {
+    require_login();
+    if (!is_faculty()) {
+        header("Location: " . BASE_URL . "/index.php");
+        exit();
+    }
+}
+
 // Require admin or faculty
 function require_faculty_or_admin() {
     require_login();

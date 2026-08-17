@@ -49,7 +49,7 @@ if ($avg) {
     $row = mysqli_fetch_assoc($avg);
     if ($row['avg_marks'] > 0) {
         $percent = $row['avg_marks'];
-        $avg_cgpa = round(($percent / 100) * 10, 2);
+        $avg_cgpa = min(10, round(($percent / 100) * 10, 2));
     }
 }
 
@@ -217,15 +217,19 @@ $recent = mysqli_query($conn, "SELECT * FROM students ORDER BY created_at DESC L
                                 <a href="students/add.php" class="btn btn-primary-custom btn-custom">
                                     <i class="fas fa-user-plus me-2"></i> Add New Student
                                 </a>
-                                <a href="subjects/add.php" class="btn btn-success-custom btn-custom">
-                                    <i class="fas fa-book me-2"></i> Add New Subject
-                                </a>
-                                <a href="marks/add.php" class="btn btn-info-custom btn-custom">
-                                    <i class="fas fa-plus-circle me-2"></i> Add Marks Record
-                                </a>
-                                <a href="performance/index.php" class="btn btn-warning-custom btn-custom">
-                                    <i class="fas fa-chart-bar me-2"></i> View Performance Reports
-                                </a>
+                                    <?php if (is_admin()): ?>
+                                    <a href="subjects/add.php" class="btn btn-success-custom btn-custom">
+                                        <i class="fas fa-book me-2"></i> Add New Subject
+                                    </a>
+                                    <?php endif; ?>
+                                    <?php if (is_faculty()): ?>
+                                    <a href="marks/add.php" class="btn btn-info-custom btn-custom">
+                                        <i class="fas fa-plus-circle me-2"></i> Add Marks Record
+                                    </a>
+                                    <?php endif; ?>
+                                    <a href="performance/index.php" class="btn btn-warning-custom btn-custom">
+                                        <i class="fas fa-chart-bar me-2"></i> View Performance Reports
+                                    </a>
                             </div>
                         </div>
                     </div>
