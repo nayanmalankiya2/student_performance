@@ -85,7 +85,7 @@ $username = trim($_REQUEST['student_username']);
                         <div class="row g-3">
                             <div class="col-md-4">
                                 <label class="form-label">Enrollment No <span class="text-danger">*</span></label>
-                                <input type="text" name="enrollment_no" class="form-control" placeholder="e.g., BCA2023001" required>
+                                <input type="text" name="enrollment_no" class="form-control"  required>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">First Name <span class="text-danger">*</span></label>
