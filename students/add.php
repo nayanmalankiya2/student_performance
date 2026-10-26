@@ -10,11 +10,32 @@ if (!isset($_SESSION['user_id'])) {
 // Only admin/faculty can add students (students are read-only)
 require_faculty_or_admin();
 
+// AJAX: Check if enrollment number already exists (called from same file)
+if (isset($_POST['action']) && $_POST['action'] === 'check_enrollment') {
+    header('Content-Type: application/json');
+    $response = ['exists' => false];
+    if (isset($_POST['enrollment_no'])) {
+        $enrollment_no = trim($_POST['enrollment_no']);
+        $check = mysqli_query($conn, "SELECT id FROM students WHERE enrollment_no = '$enrollment_no'");
+        if ($check && mysqli_num_rows($check) > 0) {
+            $response['exists'] = true;
+        }
+    }
+    echo json_encode($response);
+    mysqli_close($conn);
+    exit;
+}
+
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $enrollment_no = $_REQUEST['enrollment_no'];
+    $enrollment_no = trim($_REQUEST['enrollment_no']);
     $first_name = $_REQUEST['first_name'];
+
+    // Validate enrollment number: exactly 5 digits, numbers only
+    if (!preg_match('/^[0-9]{5}$/', $enrollment_no)) {
+        $error = 'Enrollment number must be exactly 5 digits (numbers only)!';
+    }
     $last_name = $_REQUEST['last_name'];
     $email = $_REQUEST['email'];
     $phone = $_REQUEST['phone'];
@@ -28,31 +49,50 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 $username = trim($_REQUEST['student_username']);
     $password = $_REQUEST['student_password'];
 
-    $check = mysqli_query($conn, "SELECT id FROM students WHERE enrollment_no = '$enrollment_no'");
-    if ($check && mysqli_num_rows($check) > 0) {
-        $error = 'Enrollment number already exists!';
-    } elseif (!empty($username) && mysqli_query($conn, "SELECT id FROM users WHERE username = '$username'") && mysqli_num_rows(mysqli_query($conn, "SELECT id FROM users WHERE username = '$username'")) > 0) {
-        $error = 'Username already exists! Please choose a different one.';
-    } else {
-        $str = "INSERT INTO students (enrollment_no, first_name, last_name, email, phone, gender, date_of_birth, address, semester, course, created_by) 
-                VALUES ('$enrollment_no', '$first_name', '$last_name', '$email', '$phone', '$gender', '$date_of_birth', '$address', $semester, '$course', $user_id)";
-        
-        if (mysqli_query($conn, $str)) {
-            $new_student_id = mysqli_insert_id($conn);
+    // Validate username & password are compulsory
+    if (empty($username)) {
+        $error = 'Login Username is required!';
+    } elseif (empty($password)) {
+        $error = 'Login Password is required!';
+    }
 
-            // Create login for the student if username provided
-            if (!empty($username) && !empty($password)) {
-                $hash = password_hash($password, PASSWORD_DEFAULT);
-                mysqli_query($conn, "INSERT INTO users (username, email, password, role, student_id) 
-                                     VALUES ('$username', '$email', '$hash', 'student', $new_student_id)");
-            }
+    // Validate email format
+    if (empty($error) && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = 'Invalid email format!';
+    }
 
-            $_SESSION['message'] = 'Student added successfully!';
-            $_SESSION['msg_type'] = 'success';
-            header("Location: index.php");
-            exit();
+    // Validate phone: exactly 10 digits, numbers only
+    if (empty($error) && !preg_match('/^[0-9]{10}$/', $phone)) {
+        $error = 'Mobile number must be exactly 10 digits (numbers only)!';
+    }
+
+    if (empty($error)) {
+        $check = mysqli_query($conn, "SELECT id FROM students WHERE enrollment_no = '$enrollment_no'");
+        if ($check && mysqli_num_rows($check) > 0) {
+            $error = 'Enrollment number already exists!';
+        } elseif (!empty($username) && mysqli_query($conn, "SELECT id FROM users WHERE username = '$username'") && mysqli_num_rows(mysqli_query($conn, "SELECT id FROM users WHERE username = '$username'")) > 0) {
+            $error = 'Username already exists! Please choose a different one.';
         } else {
-            $error = 'Error: ' . mysqli_error($conn);
+            $str = "INSERT INTO students (enrollment_no, first_name, last_name, email, phone, gender, date_of_birth, address, semester, course, created_by) 
+                    VALUES ('$enrollment_no', '$first_name', '$last_name', '$email', '$phone', '$gender', '$date_of_birth', '$address', $semester, '$course', $user_id)";
+            
+            if (mysqli_query($conn, $str)) {
+                $new_student_id = mysqli_insert_id($conn);
+
+                // Create login for the student if username provided
+                if (!empty($username) && !empty($password)) {
+                    $hash = password_hash($password, PASSWORD_DEFAULT);
+                    mysqli_query($conn, "INSERT INTO users (username, email, password, role, student_id) 
+                                         VALUES ('$username', '$email', '$hash', 'student', $new_student_id)");
+                }
+
+                $_SESSION['message'] = 'Student added successfully!';
+                $_SESSION['msg_type'] = 'success';
+                header("Location: index.php");
+                exit();
+            } else {
+                $error = 'Error: ' . mysqli_error($conn);
+            }
         }
     }
 }
@@ -85,7 +125,8 @@ $username = trim($_REQUEST['student_username']);
                         <div class="row g-3">
                             <div class="col-md-4">
                                 <label class="form-label">Enrollment No <span class="text-danger">*</span></label>
-                                <input type="text" name="enrollment_no" class="form-control"  required>
+                                <input type="text" name="enrollment_no" class="form-control" pattern="[0-9]{5}" minlength="5" maxlength="5" required placeholder="e.g., 12345" onblur="checkEnrollmentExists(this.value)">
+                                <span id="enrollment_exists_error" class="text-danger small d-none"></span>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">First Name <span class="text-danger">*</span></label>
@@ -101,7 +142,7 @@ $username = trim($_REQUEST['student_username']);
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Phone <span class="text-danger">*</span></label>
-                                <input type="text" name="phone" class="form-control" placeholder="Enter phone number" required>
+                                <input type="text" name="phone" class="form-control" pattern="[0-9]{10}" minlength="10" maxlength="10" required placeholder="e.g., 9876543210">
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Gender <span class="text-danger">*</span></label>
@@ -136,16 +177,16 @@ $username = trim($_REQUEST['student_username']);
                             <div class="col-12">
                                 <div class="alert alert-info alert-custom">
                                     <i class="fas fa-key me-2"></i>
-                                    <strong>Student Login Credentials (Optional):</strong> Set a username & password so this student can login and view their performance.
+                                    <strong>Student Login Credentials (Required):</strong> Username & password are required so this student can login and view their performance.
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Login Username</label>
-                                <input type="text" name="student_username" class="form-control" placeholder="e.g., student123">
+                                <label class="form-label">Login Username <span class="text-danger">*</span></label>
+                                <input type="text" name="student_username" class="form-control" placeholder="e.g., student123" required>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Login Password</label>
-                                <input type="password" name="student_password" class="form-control" placeholder="Password">
+                                <label class="form-label">Login Password <span class="text-danger">*</span></label>
+                                <input type="password" name="student_password" class="form-control" placeholder="Password" required>
                             </div>
                             <div class="col-12">
                                 <hr class="my-2">
@@ -162,6 +203,49 @@ $username = trim($_REQUEST['student_username']);
             </div>
         </div>
     </div>
+    <script>
+    // Check if enrollment number already exists (AJAX)
+    function checkEnrollmentExists(enrollment_no) {
+        var errorSpan = document.getElementById('enrollment_exists_error');
+
+        if (enrollment_no.length !== 5 || !/^[0-9]{5}$/.test(enrollment_no)) {
+            errorSpan.classList.add('d-none');
+            errorSpan.textContent = '';
+            return;
+        }
+
+        var formData = new FormData();
+        formData.append('action', 'check_enrollment');
+        formData.append('enrollment_no', enrollment_no);
+
+        fetch('add.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.exists) {
+                errorSpan.textContent = 'Enrollment number already exists!';
+                errorSpan.classList.remove('d-none');
+            } else {
+                errorSpan.classList.add('d-none');
+                errorSpan.textContent = '';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+
+    // Prevent form submission if enrollment number already exists
+    document.querySelector('form').addEventListener('submit', function(e) {
+        var errorSpan = document.getElementById('enrollment_exists_error');
+        if (!errorSpan.classList.contains('d-none') && errorSpan.textContent !== '') {
+            e.preventDefault();
+            alert('Please fix the enrollment number error before submitting.');
+        }
+    });
+    </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

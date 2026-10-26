@@ -39,6 +39,30 @@ unset($_SESSION['message'], $_SESSION['msg_type']);
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+    .table-header {
+        background: #f8f9fa;
+        padding: 15px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border: 1px solid #e9ecef;
+    }
+    .search-box {
+        position: relative;
+        width: 280px;
+    }
+    .search-box i {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6b7280;
+        font-size: 14px;
+    }
+    .search-box input {
+        padding-left: 35px;
+    }
+    </style>
 </head>
 <body>
     <?php include '../sidebar.php'; ?>
@@ -53,11 +77,17 @@ unset($_SESSION['message'], $_SESSION['msg_type']);
                 </div>
             <?php endif; ?>
             <div class="table-wrapper">
-<div class="table-header">
+<div class="table-header d-flex justify-content-between align-items-center">
                     <h5><i class="fas fa-book me-2"></i>All Subjects</h5>
-                    <?php if (!$is_readonly_view): ?>
-                    <a href="add.php" class="btn btn-primary-custom btn-custom"><i class="fas fa-plus me-1"></i> Add Subject</a>
-                    <?php endif; ?>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="search-box">
+                            <i class="fas fa-search me-2"></i>
+                            <input type="text" id="subjectSearch" class="form-control form-control-sm" placeholder="Search by subject code, name, semester...">
+                        </div>
+                        <?php if (!$is_readonly_view): ?>
+                        <a href="add.php" class="btn btn-primary-custom btn-custom"><i class="fas fa-plus me-1"></i> Add Subject</a>
+                        <?php endif; ?>
+                    </div>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
@@ -72,7 +102,7 @@ unset($_SESSION['message'], $_SESSION['msg_type']);
                                 <?php if (!$is_readonly_view): ?><th class="text-end">Actions</th><?php endif; ?>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="subjectTableBody">
                             <?php if ($result && mysqli_num_rows($result) > 0): $i = 1; while ($row = mysqli_fetch_assoc($result)): ?>
                                 <tr>
                                     <td class="fw-medium"><?php echo $i++; ?></td>
@@ -114,6 +144,45 @@ unset($_SESSION['message'], $_SESSION['msg_type']);
         </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+    // Live search for subjects table
+    document.getElementById('subjectSearch').addEventListener('input', function() {
+        var search = this.value.toLowerCase();
+        var rows = document.querySelectorAll('#subjectTableBody tr');
+
+        var visibleCount = 0;
+        rows.forEach(function(row) {
+            // Skip the "no subjects found" row
+            if (row.colSpan) return;
+
+            var subjectCode = row.cells[1]?.textContent?.toLowerCase() || '';
+            var subjectName = row.cells[2]?.textContent?.toLowerCase() || '';
+            var semester = row.cells[3]?.textContent?.toLowerCase() || '';
+
+            if (subjectCode.includes(search) || subjectName.includes(search) || semester.includes(search)) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        // Show/hide "no results" message
+        var noResultsRow = document.getElementById('noSearchResults');
+        if (visibleCount === 0 && search !== '') {
+            if (!noResultsRow) {
+                var tbody = document.getElementById('subjectTableBody');
+                var newRow = document.createElement('tr');
+                newRow.id = 'noSearchResults';
+                var colspan = document.querySelector('#subjectTableBody tr:not([colspan])')?.cells.length || 7;
+                newRow.innerHTML = '<td colspan="' + colspan + '" class="text-center py-5"><i class="fas fa-search fa-3x text-muted mb-3 d-block"></i><p class="text-muted mb-2">No subjects found matching your search.</p></td>';
+                tbody.appendChild(newRow);
+            }
+        } else if (noResultsRow) {
+            noResultsRow.remove();
+        }
+    });
+    </script>
 </body>
 </html>
 <?php mysqli_close($conn); ?>
