@@ -73,7 +73,14 @@ if (empty($error)) {
         $error = 'Invalid email format!';
     }
 
-    // Validate phone: exactly 10 digits, numbers only
+    // Validate first name: letters and spaces only
+    if (empty($error) && !preg_match('/^[a-zA-Z\s]+$/', $first_name)) {
+        $error = 'First name must contain letters only!';
+    }
+    // Validate last name: letters and spaces only
+    if (empty($error) && !preg_match('/^[a-zA-Z\s]+$/', $last_name)) {
+        $error = 'Last name must contain letters only!';
+    }
     if (empty($error) && !preg_match('/^[0-9]{10}$/', $phone)) {
         $error = 'Mobile number must be exactly 10 digits (numbers only)!';
     }

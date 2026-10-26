@@ -72,7 +72,14 @@ $username = trim($_REQUEST['student_username']);
         $error = 'Invalid email format!';
     }
 
-    // Validate phone: exactly 10 digits, numbers only
+    // Validate first name: letters and spaces only
+    if (empty($error) && !preg_match('/^[a-zA-Z\s]+$/', $first_name)) {
+        $error = 'First name must contain letters only!';
+    }
+    // Validate last name: letters and spaces only
+    if (empty($error) && !preg_match('/^[a-zA-Z\s]+$/', $last_name)) {
+        $error = 'Last name must contain letters only!';
+    }
     if (empty($error) && !preg_match('/^[0-9]{10}$/', $phone)) {
         $error = 'Mobile number must be exactly 10 digits (numbers only)!';
     }
@@ -157,11 +164,13 @@ $username = trim($_REQUEST['student_username']);
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">First Name <span class="text-danger">*</span></label>
-                                <input type="text" name="first_name" class="form-control" value="<?php echo $first_name; ?>" placeholder="Enter first name" required>
+                                <input type="text" name="first_name" class="form-control" value="<?php echo $first_name; ?>" placeholder="Enter first name" required onblur="validateName(this, 'first_name_error')">
+                                <span id="first_name_error" class="text-danger small d-none"></span>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Last Name <span class="text-danger">*</span></label>
-                                <input type="text" name="last_name" class="form-control" value="<?php echo $last_name; ?>" placeholder="Enter last name" required>
+                                <input type="text" name="last_name" class="form-control" value="<?php echo $last_name; ?>" placeholder="Enter last name" required onblur="validateName(this, 'last_name_error')">
+                                <span id="last_name_error" class="text-danger small d-none"></span>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Email <span class="text-danger">*</span></label>
@@ -278,7 +287,22 @@ $username = trim($_REQUEST['student_username']);
             e.preventDefault();
             alert('Please fix the enrollment number error before submitting.');
         }
-    });
+    })
+
+    // Validate name fields on blur
+    function validateName(field, errorId) {
+        var value = field.value.trim();
+        var errorSpan = document.getElementById(errorId);
+        if (!/^[a-zA-Z\s]+$/.test(value)) {
+            errorSpan.classList.remove('d-none');
+            errorSpan.textContent = 'Name must contain letters only!';
+            return false;
+        } else {
+            errorSpan.classList.add('d-none');
+            errorSpan.textContent = '';
+            return true;
+        }
+    };
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 </body>
