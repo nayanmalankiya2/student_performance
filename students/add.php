@@ -2,13 +2,24 @@
 include __DIR__ . '/../config/config.php';
 //include '../config/config.php';
 
+// Initialize form variables (must be before use in value attributes)
+$enrollment_no = '';
+$first_name = '';
+$last_name = '';
+$email = '';
+$phone = '';
+$gender = '';
+$date_of_birth = '';
+$course = '';
+$semester = '';
+
 if (!isset($_SESSION['user_id'])) {
     header("Location: ../login.php");
     exit();
 }
 
-// Only admin/faculty can add students (students are read-only)
-require_faculty_or_admin();
+// Only admin can add students (faculty can only edit existing students)
+require_admin();
 
 // AJAX: Check if enrollment number already exists (called from same file)
 if (isset($_POST['action']) && $_POST['action'] === 'check_enrollment') {
@@ -66,12 +77,28 @@ $username = trim($_REQUEST['student_username']);
         $error = 'Mobile number must be exactly 10 digits (numbers only)!';
     }
 
+    // Validate date of birth: student must be at least 15 years old
+    if (empty($error)) {
+        if (!empty($date_of_birth)) {
+            $dob = new DateTime($date_of_birth);
+            $today = new DateTime();
+            $age = $today->diff($dob)->y;
+            if ($age < 15) {
+                $error = 'Student must be at least 15 years old!';
+            }
+        } else {
+            $error = 'Date of birth is required!';
+        }
+    }
+
     if (empty($error)) {
         $check = mysqli_query($conn, "SELECT id FROM students WHERE enrollment_no = '$enrollment_no'");
         if ($check && mysqli_num_rows($check) > 0) {
             $error = 'Enrollment number already exists!';
         } elseif (!empty($username) && mysqli_query($conn, "SELECT id FROM users WHERE username = '$username'") && mysqli_num_rows(mysqli_query($conn, "SELECT id FROM users WHERE username = '$username'")) > 0) {
             $error = 'Username already exists! Please choose a different one.';
+        } elseif (!empty($email) && mysqli_query($conn, "SELECT id FROM users WHERE email = '$email'") && mysqli_num_rows(mysqli_query($conn, "SELECT id FROM users WHERE email = '$email'")) > 0) {
+            $error = 'Email already exists! Please use a different email address.';
         } else {
             $str = "INSERT INTO students (enrollment_no, first_name, last_name, email, phone, gender, date_of_birth, address, semester, course, created_by) 
                     VALUES ('$enrollment_no', '$first_name', '$last_name', '$email', '$phone', '$gender', '$date_of_birth', '$address', $semester, '$course', $user_id)";
@@ -125,24 +152,24 @@ $username = trim($_REQUEST['student_username']);
                         <div class="row g-3">
                             <div class="col-md-4">
                                 <label class="form-label">Enrollment No <span class="text-danger">*</span></label>
-                                <input type="text" name="enrollment_no" class="form-control" pattern="[0-9]{5}" minlength="5" maxlength="5" required placeholder="e.g., 12345" onblur="checkEnrollmentExists(this.value)">
+                                <input type="text" name="enrollment_no" class="form-control" value="<?php echo $enrollment_no; ?>" pattern="[0-9]{5}" minlength="5" maxlength="5" required placeholder="e.g., 12345" onblur="checkEnrollmentExists(this.value)">
                                 <span id="enrollment_exists_error" class="text-danger small d-none"></span>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">First Name <span class="text-danger">*</span></label>
-                                <input type="text" name="first_name" class="form-control" placeholder="Enter first name" required>
+                                <input type="text" name="first_name" class="form-control" value="<?php echo $first_name; ?>" placeholder="Enter first name" required>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Last Name <span class="text-danger">*</span></label>
-                                <input type="text" name="last_name" class="form-control" placeholder="Enter last name" required>
+                                <input type="text" name="last_name" class="form-control" value="<?php echo $last_name; ?>" placeholder="Enter last name" required>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Email <span class="text-danger">*</span></label>
-                                <input type="email" name="email" class="form-control" placeholder="student@example.com" required>
+                                <input type="email" name="email" class="form-control" value="<?php echo $email; ?>" placeholder="student@example.com" required>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Phone <span class="text-danger">*</span></label>
-                                <input type="text" name="phone" class="form-control" pattern="[0-9]{10}" minlength="10" maxlength="10" required placeholder="e.g., 9876543210">
+                                <input type="text" name="phone" class="form-control" value="<?php echo $phone; ?>" pattern="[0-9]{10}" minlength="10" maxlength="10" required placeholder="e.g., 9876543210">
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Gender <span class="text-danger">*</span></label>
@@ -155,7 +182,7 @@ $username = trim($_REQUEST['student_username']);
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Date of Birth <span class="text-danger">*</span></label>
-                                <input type="date" name="date_of_birth" class="form-control" required>
+                                <input type="date" name="date_of_birth" class="form-control" value="<?php echo $date_of_birth; ?>" required min="1995-01-01">
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Semester <span class="text-danger">*</span></label>
@@ -168,7 +195,14 @@ $username = trim($_REQUEST['student_username']);
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Course <span class="text-danger">*</span></label>
-                                <input type="text" name="course" class="form-control" value="BCA" required>
+                                <select name="course" class="form-control" required>
+                                    <option value="">Select Course</option>
+                                    <option value="BCA">BCA</option>
+                                    <option value="B.ED">B.ED</option>
+                                    <option value="BBA">BBA</option>
+                                    <option value="B.COM">B.COM</option>
+                                    <option value="BA">BA</option>
+                                </select>
                             </div>
 <div class="col-md-12">
                                 <label class="form-label">Address</label>

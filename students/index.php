@@ -93,7 +93,9 @@ unset($_SESSION['message'], $_SESSION['msg_type']);
                             <i class="fas fa-search me-2"></i>
                             <input type="text" id="studentSearch" class="form-control form-control-sm" placeholder="Search by enrollment, name, phone...">
                         </div>
-                        <a href="add.php" class="btn btn-primary-custom btn-custom"><i class="fas fa-plus me-1"></i> Add New Student</a>
+                        <?php if (is_admin()): ?>
+<a href="add.php" class="btn btn-primary-custom btn-custom"><i class="fas fa-plus me-1"></i> Add New Student</a>
+<?php endif; ?>
                     </div>
                 </div>
                 <div class="table-responsive">

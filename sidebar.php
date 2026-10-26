@@ -15,10 +15,6 @@
             <i class="fas fa-user-graduate"></i>
             <span>My Profile</span>
         </a>
-        <a href="<?php echo $base_url; ?>/students/edit_my_profile.php" class="nav-item <?php echo strpos($_SERVER['PHP_SELF'], 'edit_my_profile.php') !== false ? 'active' : ''; ?>">
-            <i class="fas fa-user-edit"></i>
-            <span>Edit My Profile</span>
-        </a>
         <?php else: ?>
         <a href="<?php echo $base_url; ?>/students/index.php" class="nav-item <?php echo strpos($_SERVER['PHP_SELF'], '/students/') !== false ? 'active' : ''; ?>">
             <i class="fas fa-user-graduate"></i>

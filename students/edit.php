@@ -2,6 +2,16 @@
 include __DIR__ . '/../config/config.php';
 //include '../config/config.php';
 
+// Initialize form variables (must be before use in value attributes)
+$enrollment_no = '';
+$first_name = '';
+$last_name = '';
+$email = '';
+$phone = '';
+$gender = '';
+$date_of_birth = '';
+$course = '';
+
 if (!isset($_SESSION['user_id'])) {
     header("Location: ../login.php");
     exit();
@@ -23,16 +33,62 @@ if (!$student) {
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $enrollment_no = $_REQUEST['enrollment_no'];
-    $first_name = $_REQUEST['first_name'];
-    $last_name = $_REQUEST['last_name'];
-    $email = $_REQUEST['email'];
-    $phone = $_REQUEST['phone'];
+    $enrollment_no = trim($_REQUEST['enrollment_no']);
+    $first_name = trim($_REQUEST['first_name']);
+    $last_name = trim($_REQUEST['last_name']);
+    $email = trim($_REQUEST['email']);
+    $phone = trim($_REQUEST['phone']);
     $gender = $_REQUEST['gender'];
     $date_of_birth = $_REQUEST['date_of_birth'];
-    $address = $_REQUEST['address'];
+
+// Validate date of birth: student must be at least 15 years old
+if (empty($error)) {
+    if (!empty($date_of_birth)) {
+        $dob = new DateTime($date_of_birth);
+        $today = new DateTime();
+        $age = $today->diff($dob)->y;
+        if ($age < 15) {
+            $error = 'Student must be at least 15 years old!';
+        }
+    } else {
+        $error = 'Date of birth is required!';
+    }
+}
+    $address = trim($_REQUEST['address']);
     $semester = (int)$_REQUEST['semester'];
-    $course = $_REQUEST['course'];
+    $course = trim($_REQUEST['course']);
+
+    // Validate required fields
+    if (empty($enrollment_no) || empty($first_name) || empty($last_name) || empty($email) || empty($phone) || empty($gender) || empty($date_of_birth) || empty($course)) {
+        $error = 'Please fill in all required fields.';
+    }
+
+    // Validate enrollment number: exactly 5 digits, numbers only
+    if (empty($error) && !preg_match('/^[0-9]{5}$/', $enrollment_no)) {
+        $error = 'Enrollment number must be exactly 5 digits (numbers only)!';
+    }
+
+    // Validate email format
+    if (empty($error) && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = 'Invalid email format!';
+    }
+
+    // Validate phone: exactly 10 digits, numbers only
+    if (empty($error) && !preg_match('/^[0-9]{10}$/', $phone)) {
+        $error = 'Mobile number must be exactly 10 digits (numbers only)!';
+    }
+
+    // Admin-only: Validate username & password are compulsory
+    if (empty($error) && is_admin()) {
+        $login_username = trim($_REQUEST['login_username']);
+        $login_password = $_REQUEST['login_password'];
+
+        if (empty($login_username)) {
+            $error = 'Login Username is required!';
+        } elseif (empty($login_password)) {
+            $error = 'Login Password is required!';
+        }
+    }
 
 $str = "UPDATE students SET 
             enrollment_no = '$enrollment_no',
@@ -48,7 +104,8 @@ $str = "UPDATE students SET
             WHERE id = $id";
     
     if (mysqli_query($conn, $str)) {
-        // Update student login credentials
+        // Update student login credentials (Admin only)
+        if (is_admin()) {
         $login_username = trim($_REQUEST['login_username']);
         $login_password = $_REQUEST['login_password'];
 
@@ -78,6 +135,7 @@ $str = "UPDATE students SET
             $hash = password_hash($login_password, PASSWORD_DEFAULT);
             mysqli_query($conn, "INSERT INTO users (username, email, password, role, student_id) 
                                  VALUES ('$login_username', '$email', '$hash', 'student', $id)");
+        }
         }
 
         if (empty($error)) {
@@ -124,7 +182,10 @@ $saved_username = $saved_login ? $saved_login['username'] : '';
                         <div class="row g-3">
                             <div class="col-md-4">
                                 <label class="form-label">Enrollment No <span class="text-danger">*</span></label>
-                                <input type="text" name="enrollment_no" class="form-control" value="<?php echo htmlspecialchars($student['enrollment_no']); ?>" required>
+                                <input type="text" name="enrollment_no" class="form-control" 
+       value="<?php echo htmlspecialchars($student['enrollment_no']); ?>" 
+       pattern="[0-9]{5}" minlength="5" maxlength="5" required 
+       placeholder="e.g., 12345">
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">First Name <span class="text-danger">*</span></label>
@@ -152,7 +213,7 @@ $saved_username = $saved_login ? $saved_login['username'] : '';
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Date of Birth <span class="text-danger">*</span></label>
-                                <input type="date" name="date_of_birth" class="form-control" value="<?php echo $student['date_of_birth']; ?>" required>
+                                <input type="date" name="date_of_birth" class="form-control" value="<?php echo $student['date_of_birth']; ?>" required min="1995-01-01">
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Semester <span class="text-danger">*</span></label>
@@ -164,13 +225,21 @@ $saved_username = $saved_login ? $saved_login['username'] : '';
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Course <span class="text-danger">*</span></label>
-                                <input type="text" name="course" class="form-control" value="<?php echo htmlspecialchars($student['course']); ?>" required>
+                                <select name="course" class="form-control" required>
+                                    <option value="">Select Course</option>
+                                    <option value="BCA">BCA</option>
+                                    <option value="B.ED">B.ED</option>
+                                    <option value="BBA">BBA</option>
+                                    <option value="B.COM">B.COM</option>
+                                    <option value="BA">BA</option>
+                                </select>
                             </div>
 <div class="col-md-12">
                                 <label class="form-label">Address</label>
                                 <textarea name="address" class="form-control" rows="3"><?php echo htmlspecialchars($student['address']); ?></textarea>
                             </div>
-                            <div class="col-12">
+                            <?php if (is_admin()): ?>
+<div class="col-12">
                                 <div class="alert alert-info alert-custom">
                                     <i class="fas fa-key me-2"></i>
                                     <strong>Student Login Credentials:</strong> Update the username/password so this student can login and view their performance.
@@ -187,6 +256,7 @@ $saved_username = $saved_login ? $saved_login['username'] : '';
                                 <label class="form-label">Login Password</label>
                                 <input type="password" name="login_password" class="form-control" placeholder="Leave empty to keep current password">
                             </div>
+<?php endif; ?>
                             <div class="col-12">
                                 <hr class="my-2">
                                 <button type="submit" class="btn btn-primary-custom btn-custom">

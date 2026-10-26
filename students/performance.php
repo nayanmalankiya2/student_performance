@@ -114,12 +114,6 @@ if ($total_max > 0) {
                                     <small class="text-muted">CGPA</small>
                                 </div>
                             </div>
-                            <?php if (is_student()): ?>
-                            <hr>
-                            <a href="edit_my_profile.php" class="btn btn-primary-custom btn-custom w-100">
-                                <i class="fas fa-user-edit me-2"></i> Edit My Profile
-                            </a>
-                            <?php endif; ?>
                         </div>
                     </div>
                 </div>

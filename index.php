@@ -214,14 +214,14 @@ $recent = mysqli_query($conn, "SELECT * FROM students ORDER BY created_at DESC L
                                 <a href="setup.php" class="btn btn-primary-custom btn-custom">
                                     <i class="fas fa-database me-2"></i> Setup Database
                                 </a>
+                                <?php if (is_admin()): ?>
                                 <a href="students/add.php" class="btn btn-primary-custom btn-custom">
                                     <i class="fas fa-user-plus me-2"></i> Add New Student
                                 </a>
-                                    <?php if (is_admin()): ?>
-                                    <a href="subjects/add.php" class="btn btn-success-custom btn-custom">
-                                        <i class="fas fa-book me-2"></i> Add New Subject
-                                    </a>
-                                    <?php endif; ?>
+                                <a href="subjects/add.php" class="btn btn-success-custom btn-custom">
+                                    <i class="fas fa-book me-2"></i> Add New Subject
+                                </a>
+                                <?php endif; ?>
                                     <?php if (is_faculty()): ?>
                                     <a href="marks/add.php" class="btn btn-info-custom btn-custom">
                                         <i class="fas fa-plus-circle me-2"></i> Add Marks Record
